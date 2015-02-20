@@ -6,10 +6,10 @@
 
 """
 
-from basic_sp_parser import BasicSPParser
+from sp_parser.basic_sp_parser import BasicSPParser
 
 
-class TheDir(BasicSPParser):
+class TheParser(BasicSPParser):
 
     THEDIR = "/proc/thedir"
 
@@ -20,7 +20,7 @@ class TheDir(BasicSPParser):
     def get_groups():
         """
         
-            paste rules here
+        paste rules here
 
         """
 

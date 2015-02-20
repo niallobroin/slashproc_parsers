@@ -21,7 +21,7 @@ cache_alignment : 64
 address sizes   : 38 bits physical, 48 bits virtual
 power management:
 
-processor   : 0
+processor   : 1
 vendor_id   : GenuineIntel
 cpu family  : 6
 model   : 23

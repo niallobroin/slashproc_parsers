@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 
-from slash_proc_parsers.spparsers.basic_sp_parser import BasicSPParser
-
-
+from sp_parser.basic_sp_parser import BasicSPParser
 
 
 class CpuInfo(BasicSPParser):
 
     CPUINFO = "/proc/cpuinfo"
-
-    CPUINFO = "cpuinfo"
 
     def __init__(self):
         super(CpuInfo, self).__init__(self)
@@ -21,8 +17,7 @@ class CpuInfo(BasicSPParser):
         Static method to define groups that that sp_parser can parse
         """
         retdict = CpuInfo.parse_cpuinfo()
-        groups = {'cpuinfo': {'name': 'cpuinfo', 'parents': ['root']},
-                  'core': {'name': 'cpuinfo', 'parents': ['cpuinfo']}}
+        groups =  {'core': {'name': 'cpuinfo', 'parents': ['root']}}
 
         for i in retdict['core']:
             groups[CpuInfo.key_format(i)] = {'name': i, 'parents': ['core']}
@@ -35,16 +30,16 @@ class CpuInfo(BasicSPParser):
         Static method to define vars that that sp_parser can parse
         """
         retdict = CpuInfo.parse_cpuinfo()
-        mets = dict()
+        thevars = dict()
         parents = retdict['core'].keys()
        
         
         for i in retdict['core']['core0']:
-            mets[CpuInfo.key_format(i)] = {'name': i,
-                          'unit': '',
-                          'parents': parents}
+            thevars[CpuInfo.key_format(i)] = {'name': i,
+                                              'unit': '',
+                                              'parents': parents}
         
-        return mets
+        return thevars
 
 
     @staticmethod
@@ -76,7 +71,7 @@ class CpuInfo(BasicSPParser):
 
 if __name__ == "__main__":
     c = CpuInfo()
-    c.run()
+    c.test_parse()
 
 
 

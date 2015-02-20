@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-
-from basic_sp_parser import BasicSPParser
-
+import re
+from sp_parser.basic_sp_parser import BasicSPParser
 
 
 class MemInfo(BasicSPParser):
@@ -47,7 +46,7 @@ class MemInfo(BasicSPParser):
             if not match:
                 continue # skip lines that don't parse
             k, v = match.groups(['key', 'value'])
-            memcache[self.key_format(k)] = int(v)
+            memcache[MemInfo.key_format(k)] = int(v)
         
         if param == 'data':
             return memcache
@@ -56,9 +55,9 @@ class MemInfo(BasicSPParser):
             
         mets = dict()
         for i in memcache.keys():
-            mets[self.key_format(i)] = {'name': i,
-                              'unit': 'kB',
-                              'parents': ['meminfo']}
+            mets[MemInfo.key_format(i)] = {'name': i,
+                                        'unit': 'kB',
+                                        'parents': ['meminfo']}
         
         return mets
 
@@ -68,7 +67,7 @@ class MemInfo(BasicSPParser):
 
 if __name__ == "__main__":
     c = MemInfo()
-    c.run()
+    c.test_parse()
 
 
 

@@ -4,7 +4,7 @@ import re
 from sp_parser.basic_sp_parser import BasicSPParser
 
 
-class Load(BasicSPParser):
+class LoadAvg(BasicSPParser):
     """
     The first three columns measure CPU and IO utilization of the last one, five, and 10 minute periods. The fourth column shows the number of currently running processes and the total number of processes. The last column displays the last process ID used.
     """
@@ -12,7 +12,7 @@ class Load(BasicSPParser):
     PROC = "/proc/loadavg"
 
     def __init__(self):
-        super(Load, self).__init__(self)
+        super(LoadAvg, self).__init__(self)
 
     @staticmethod
     def get_groups():
@@ -41,12 +41,13 @@ class Load(BasicSPParser):
                    'loadavg_10mins': {'name': "cpu and IO utilisation of last 10 mins",
                                        'parents': parents,
                                        'unit': '%'},
-                   'current_num_processes': {'name': "Current number of Processes",
+                   'curr_num_proc_over_tot': {'name': "Current number of Processes / Total number of processes",
                                        'parents': parents,
                                        'unit': '%'},
-                   'total_num_processes': {'name': "Total number of processes",
+                   'last_proc_id_used': {'name': "Last Process ID used",
                                        'parents': parents,
                                        'unit': '%'},
+                                       
                    }
             
         return thevars
@@ -62,8 +63,8 @@ class Load(BasicSPParser):
         return {'loadavg':{'loadavg_1min': a[0],
                            'loadavg_5mins': a[1],
                            'loadavg_10mins': a[2],
-                           'curr_num_processes': a[3],
-                           'total_num_processes': a[4],
+                           'curr_num_proc_over_tot': a[3],
+                           'last_proc_id_used': a[4],
                }}
 
 

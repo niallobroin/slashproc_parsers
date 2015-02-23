@@ -14,7 +14,8 @@ class CpuInfo(BasicSPParser):
     @staticmethod
     def get_groups():
         """
-        Static method to define groups that that sp_parser can parse
+        Enumerate the groups depending on the number of cores
+        :rtype dict
         """
         retdict = CpuInfo.parse_cpuinfo()
         groups =  {'core': {'name': 'cpuinfo', 'parents': ['root']}}
@@ -27,7 +28,9 @@ class CpuInfo(BasicSPParser):
     @staticmethod
     def get_vars():
         """
-        Static method to define vars that that sp_parser can parse
+        Create the vars from the first core entry.
+        Assumes all the cores are the same!!
+        :rtype dict
         """
         retdict = CpuInfo.parse_cpuinfo()
         thevars = dict()
@@ -38,12 +41,18 @@ class CpuInfo(BasicSPParser):
             thevars[CpuInfo.key_format(i)] = {'name': i,
                                               'unit': '',
                                               'parents': parents}
-        
+        # TODO Add desc to every entry here 
+
+
         return thevars
 
 
     @staticmethod
     def get_data():
+        """
+        Returns the parsed directory
+        :rtype dict
+        """
         return CpuInfo.parse_cpuinfo()
 
 
@@ -51,6 +60,7 @@ class CpuInfo(BasicSPParser):
     def parse_cpuinfo():
         """
         Parse /proc/cpuinfo
+        :rtype dict
         """
         retdict = {'core': dict()}
         for l in open(CpuInfo.CPUINFO):

@@ -68,10 +68,17 @@ class BasicSPParser(object):
 
         Ensure group names are unique
             if there are multiple then subscript with number etc...
-
+        Ensure var names are all lower case, contain underscores (not dash)
+            and the following chars are not permitted "()[]/\ "
         Ensure each group has a parent, and parents must be list
-
         Ensure at least one group has parent 'root'
+
+        Example {'group1': {'name': 'The first group', parents: ['root']},
+                 'group2': {'name': 'The second group', parents: ['group1'],
+                            'desc':'Desc recommended but not necessary'}
+                 }
+        :param debug: Debug flag to print debug output
+        :rtype bool:
         """
         errors = list()
         debug_msg = ["Validating Groups"]
@@ -128,6 +135,17 @@ class BasicSPParser(object):
         """
         This method may be called by other classes to ensure the test_parser
         is returning correctly formatted results. 
+
+        Ensure var names are all lower case, contain underscores (not dash)
+            and the following chars are not permitted "()[]/\ "
+        Ensure every var has a unit
+
+        Example: {'var1': {'name': 'The first Variable', 'unit': ''},
+                  'var2': {'name': 'The Second Variable', 'unit': 'kB', 
+                            'desc': 'Description recommended but not necessary'}
+                  }
+        :param debug: Debug flag to print debug output
+        :rtype bool:
         """
         errors = list()
         debug_msg = ["Validating Vars"]
@@ -162,7 +180,21 @@ class BasicSPParser(object):
     def validate_data(self, debug=False):
         """
         This method may be called by other classes to ensure the test_parser
-        is returning correctly formatted results. 
+        is returning correctly formatted results.
+
+        Ensure return_dict adheres to the groups structure
+        Ensure all groups are present in the groups dict
+        Ensure all vars adhere to the var format
+        Ensure all vars are present in the vars dict
+        Ensure every value is a string
+
+        Example: {'group1': {
+                            'group2': {'var1': 'val1',
+                                       'var2': 'val2'},
+                            }
+                 }
+        :param debug: Debug flag to print debug output
+        :rtype bool:
         """
 
         errors = list()
@@ -176,6 +208,9 @@ class BasicSPParser(object):
         def validate_sub(subdata):
 
             for k in subdata.keys():
+
+                if k != self.key_format(k):
+                    errors.append("Error key format does not confirm")
 
                 if isinstance(subdata[k], dict) and k not in groups:
                     errors.append("Error group '%s' not found" % k)

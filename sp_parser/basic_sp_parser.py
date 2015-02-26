@@ -26,6 +26,8 @@ class MSG(object):
     debug6 = "Validating Groups"
     debug7 = "'desc' not defined for group '%s'"
     debug8 = "'desc' not defined for var '%s'"
+    debug9 = "Recommend 'label' not defined for var '%s'"
+    debug10 = "Recommend 'unit' not defined for var '%s'"
 
     err1 = "Error key format does not confirm"
     err2 = "Error group '%s' not found"
@@ -37,8 +39,8 @@ class MSG(object):
     err8 = "Error One and only one, group must have a parent 'root'"
     err9 = "Error parent '%s' not in groups"
     err10 = "Var '%s' not formatted correctly"
-    err11 = "Error 'name' not defined for var '%s'"
-    err12 = "Error 'unit' not defined for var '%s'"
+
+
     err13 = "Group '%s' must be dict"
     err14 = "get_var must return a dict"
     err15 = "First Level in data should be the class name"
@@ -139,9 +141,9 @@ class BasicSPParser(object):
                 errors.append(MSG.err(4, g))
 
             if not isinstance(groups[g], dict):
-                errors.append(MSG.err(13, g)
+                errors.append(MSG.err(13, g))
 
-            if 'name' not in groups[g]:
+            if 'label' not in groups[g]:
                 errors.append(MSG.err(5, g))
         
             if 'desc' not in groups[g]:
@@ -219,11 +221,11 @@ class BasicSPParser(object):
             if not isinstance(thevars[v], dict):
                 errors.append(MSG.err(15, g))
 
-            if 'name' not in thevars[v]:
-                errors.append(MSG.err(11, v))
+            if 'label' not in thevars[v]:
+                debug_msg.append(MSG.debug(9, v))
         
             if 'unit' not in thevars[v]:
-                errors.append(MSG.err(12, v))
+                debug_msg.append(MSG.debug(10, v))
         
             if 'desc' not in thevars[v]:
                 debug_msg.append(MSG.debug(8,v))

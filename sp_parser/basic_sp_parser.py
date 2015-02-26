@@ -16,7 +16,7 @@ class SPParserError(Exception):
         self.value = value
 
     def __str__(self):
-        return rept(self.value)
+        return repr(self.value)
 
 
 
@@ -105,7 +105,7 @@ class BasicSPParser(object):
                 errors.append("Error 'parents' not defined for group '%s'" % g)
 
             #parents must be list
-            if isinstance(groups[g]['parents'], list):
+            if not isinstance(groups[g]['parents'], list):
                 errors.append("Error 'parents' must be a list for group '%s'" % g)
 
             #Flatten parents
@@ -249,6 +249,7 @@ class BasicSPParser(object):
         d = self.validate_data(debug=debug)
         if not g or not v or not d:
             return False
+        return True
 
     def pp_groups(self):
         """

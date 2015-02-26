@@ -144,7 +144,7 @@ class BasicSPParser(object):
                 errors.append(MSG.err(13, g))
 
             if 'label' not in groups[g]:
-                debug_msg.append(MSG.err(5, g))
+                debug_msg.append(MSG.debug(11, g))
         
             if 'desc' not in groups[g]:
                 debug_msg.append(MSG.debug(7, g))
@@ -212,7 +212,7 @@ class BasicSPParser(object):
         thevars = self.get_vars()
 
         if not isinstance(thevars, dict):
-            errors.append(MSG.err(14, g))
+            errors.append(MSG.err(14))
 
         for v in thevars:
             if v != self.key_format(v):
@@ -273,7 +273,7 @@ class BasicSPParser(object):
         data = self.get_data()
 
         if (len(data.keys()) > 1 or data.get(self.cl(), False)):
-            errors.append(MSG.err(14))
+            errors.append(MSG.err(16))
 
         #Recursion function to validate and help debug the parser
         def validate_sub(subdata):

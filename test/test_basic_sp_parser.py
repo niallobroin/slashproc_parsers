@@ -132,15 +132,17 @@ class TestGroupsValidationFailed(unittest.TestCase):
         parser = self.MalformedGroupsParser()
         result = parser.validate_groups(debug=True)
 
-        errors = [err.lower() for err in self.output if err.strip()][1:]
+        errors = [err for err in self.output if err.strip()][1:]
 
         expected_messages = {
-                             #MSG.debug(7, 'subgroup1'),
-                             MSG.err(5, 'subgroup2'),
-                             MSG.err(9, 'not_exists')}
-
+                             MSG.debug(7, 'subgroup1'),
+                             MSG.debug(11, 'subgroup2'),
+                             MSG.err(9, 'not_exists'),
+                             MSG.debug(11, 'group1'),
+                             MSG.debug(11, 'subgroup1'),
+                             MSG.err(16)}
         for err in errors:
-            self.assertTrue(err in expected_messages)
+            self.assertTrue(err in expected_messages, err)
 
         self.assertFalse(result, "Groups validation supposed to fail but succeeded")
 
@@ -181,16 +183,17 @@ class TestVarsValidationFailed(unittest.TestCase):
         parser = self.MalformedVarsParser()
         result = parser.validate_vars(debug=True)
 
-        errors = [err.lower() for err in self.output if err.strip()][1:]
+        errors = [err for err in self.output if err.strip()][1:]
 
-        expected_messages = {MSG.err(10, 'bad var key',
+        expected_messages = {MSG.err(10, 'bad var key'),
                              MSG.debug(8, 'has_no_description'),
                              MSG.debug(9, 'has_no_name'),
-                             MSG.debug(10, 'has_no_unit')}
+                             MSG.debug(10, 'has_no_unit'),
+                             MSG.debug(9, 'has_no_description')}
 
 
         for err in errors:
-            self.assertTrue(err in expected_messages)
+            self.assertTrue(err in expected_messages, err)
 
         self.assertFalse(result, "Variables validation supposed to fail, but succeeded")
 
@@ -237,16 +240,17 @@ class TestDataValidationFailed(unittest.TestCase):
         parser = self.MalformedDataParser()
         result = parser.validate_data(debug=True)
 
-        errors = [err.lower() for err in self.output if err.strip()][1:]
-        errors = [err for err in errors if "recur" not in err and not err.startswith("found")]
+        errors = [err for err in self.output if err.strip()][1:]
+        errors = [err for err in errors if "Recur" not in err and not err.startswith("Found")]
 
         expected_errors = {MSG.err(2, 'not_found_group'),
                            MSG.err(3, 'not_found_var'),
                            MSG.err(1),
-                           MSG.err(2, 'bad key')}
+                           MSG.err(2, 'bad key'),
+                           MSG.err(16)}
 
         for err in errors:
-            self.assertTrue(err in expected_errors)
+            self.assertTrue(err in expected_errors, err)
 
         self.assertFalse(result, "Data validation supposed to fail, but succeeded")
 

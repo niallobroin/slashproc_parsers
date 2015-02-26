@@ -2,7 +2,7 @@
 import sys
 import unittest
 from sp_parser.basic_sp_parser import BasicSPParser
-
+from sp_parser.basic_sp_parser import MSG
 
 class DummyParser(BasicSPParser):
     """Mockup parser for testing purposes.
@@ -134,9 +134,10 @@ class TestGroupsValidationFailed(unittest.TestCase):
 
         errors = [err.lower() for err in self.output if err.strip()][1:]
 
-        expected_messages = {r"'desc' not defined for group 'subgroup1'",
-                             r"error 'name' not defined for group 'subgroup2'",
-                             r"error parent 'not_exists' not in groups"}
+        expected_messages = {
+                             #MSG.debug(7, 'subgroup1'),
+                             MSG.err(5, 'subgroup2'),
+                             MSG.err(9, 'not_exists')}
 
         for err in errors:
             self.assertTrue(err in expected_messages)
@@ -160,11 +161,11 @@ class TestVarsValidationFailed(unittest.TestCase):
 
         @staticmethod
         def get_vars():
-            return {'bad var key': {'name': 'The badly named var', 'unit': '',
+            return {'bad var key': {'label': 'The badly named var', 'unit': '',
                                     'desc': 'Variable has incorrect key'},
                     'has_no_name': {'unit': 'kB',
                                     'desc': 'Variable has no name key'},
-                    'has_no_unit': {'name': 'Var without unit',
+                    'has_no_unit': {'label': 'Var without unit',
                                     'desc': 'Variable has no unit key'},
                     'has_no_description': {'name': 'Var without description',
                                            'unit': 'MB'}}
@@ -182,10 +183,11 @@ class TestVarsValidationFailed(unittest.TestCase):
 
         errors = [err.lower() for err in self.output if err.strip()][1:]
 
-        expected_messages = {r"var 'bad var key' not formatted correctly",
-                             r"error 'name' not defined for var 'has_no_name'",
-                             r"error 'unit' not defined for var 'has_no_unit'",
-                             r"'desc' not defined for var 'has_no_description'"}
+        expected_messages = {MSG.err(10, 'bad var key',
+                             MSG.debug(8, 'has_no_description'),
+                             MSG.debug(9, 'has_no_name'),
+                             MSG.debug(10, 'has_no_unit')}
+
 
         for err in errors:
             self.assertTrue(err in expected_messages)
@@ -238,10 +240,10 @@ class TestDataValidationFailed(unittest.TestCase):
         errors = [err.lower() for err in self.output if err.strip()][1:]
         errors = [err for err in errors if "recur" not in err and not err.startswith("found")]
 
-        expected_errors = {r"error group 'not_found_group' not found",
-                           r"variable 'not_found_var' not found",
-                           r"error key format does not confirm",
-                           r"error group 'bad key' not found"}
+        expected_errors = {MSG.err(2, 'not_found_group'),
+                           MSG.err(3, 'not_found_var'),
+                           MSG.err(1),
+                           MSG.err(2, 'bad key')}
 
         for err in errors:
             self.assertTrue(err in expected_errors)

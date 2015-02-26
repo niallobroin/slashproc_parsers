@@ -25,14 +25,15 @@ class MSG(object):
     debug6 = "Validating Groups"
     debug7 = "'desc' not defined for group '%s'"
     debug8 = "'desc' not defined for var '%s'"
-    debug9 = "Recommend 'label' not defined for var '%s'"
-    debug10 = "Recommend 'unit' not defined for var '%s'"
+    debug9 = "Recommend 'label' be defined for var '%s'"
+    debug10 = "Recommend 'unit' be defined for var '%s'"
+    debug11 = "Recommend 'label' be defined for group '%s'"
 
-    err1 = "Error key format does not confirm"
+    err1 = "Error key format does not conform"
     err2 = "Error group '%s' not found"
     err3 = "Variable '%s' not found"
     err4 = "Group '%s' not formatted correctly"
-    err5 = "Error 'name' not defined for group '%s'"
+
     err6 = "Error 'parents' not defined for group '%s'"
     err7 = "Error 'parents' must be a list for group '%s'"
     err8 = "Error One and only one, group must have a parent 'root'"
@@ -143,7 +144,7 @@ class BasicSPParser(object):
                 errors.append(MSG.err(13, g))
 
             if 'label' not in groups[g]:
-                errors.append(MSG.err(5, g))
+                debug_msg.append(MSG.err(5, g))
         
             if 'desc' not in groups[g]:
                 debug_msg.append(MSG.debug(7, g))

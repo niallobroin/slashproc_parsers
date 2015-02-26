@@ -30,24 +30,17 @@ class UpTime(BasicSPParser):
 
             Returns: thevars (dict): variables
         """
-        retdict = UpTime.get_data()
-        thevars = dict()
-        for i in retdict.keys():
-            thevars[UpTime.key_format(i)] = {
-                'label': i,
-                'unit': '',
-                'parents': ['uptime']
-            }
+        thevars = {
+                'total': {'desc': "The total number of seconds the system has been up",
+                          'label': 'Total Uptime',
+                          'unit': 'Seconds',
+                          'parents': ['uptime'],},
 
-        descs = {
-            ('total', 'The total number of seconds the system has been up', 'Seconds'),
-            ('idle', 'The total number of seconds the system has been up and idle', 'Seconds')
-        }
-
-        for var, desc, unit in descs:
-            if var in thevars:
-                thevars[var]['desc'] = desc
-                thevars[var]['unit'] = unit
+                'idle': {'desc': "The total number of seconds the system has been up and idle",
+                         'label': 'Idle Uptime',
+                         'unit': 'Seconds',
+                         'parents': ['uptime'],},
+                }
         return thevars
 
     @staticmethod

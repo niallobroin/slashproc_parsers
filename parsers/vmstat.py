@@ -23,7 +23,7 @@ class VmStat(BasicSPParser):
         Returns:
             dict: groups
         """
-        return {'vmstat': {'name': 'vmstat', 'parents': ['root']}}
+        return {'vmstat': {'label': 'vmstat', 'parents': ['root']}}
 
     @staticmethod
     def get_vars():
@@ -36,11 +36,11 @@ class VmStat(BasicSPParser):
             thevars (dict): variables
 
         """
-        retdict = VmStat.parse_vmstat()
+        retdict = VmStat.get_data()
         thevars = dict()
         for i in retdict.keys():
             thevars[VmStat.key_format(i)] = {
-                'name': i,
+                'label': i,
                 'unit': '',
                 'parents': ['vmstat']
             }
@@ -91,21 +91,13 @@ class VmStat(BasicSPParser):
         }
 
         for var, desc, unit in descs:
-            thevars[var]['desc'] = desc
-            thevars[var]['unit'] = unit
+            if var in thevars:
+                thevars[var]['desc'] = desc
+                thevars[var]['unit'] = unit
         return thevars
 
     @staticmethod
     def get_data():
-        """Gets variable-value pairs from /proc/vmstat
-
-        Returns:
-            dict: parsed variables from
-        """
-        return VmStat.parse_vmstat()
-
-    @staticmethod
-    def parse_vmstat():
         """
         Parse /proc/vmstat. All variables are stored in single group.
 

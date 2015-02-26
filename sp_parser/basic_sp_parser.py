@@ -9,15 +9,12 @@ individual sp_parsers.
 import pprint
 
 
-
-
 class SPParserError(Exception):
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
         return repr(self.value)
-
 
 
 class BasicSPParser(object):
@@ -72,11 +69,22 @@ class BasicSPParser(object):
             and the following chars are not permitted "()[]/\ "
         Ensure each group has a parent, and parents must be list
         Ensure at least one group has parent 'root'
+        Recommend every group has a label
+        Recommend every group has a description
 
-        Example {'group1': {'name': 'The first group', parents: ['root']},
-                 'group2': {'name': 'The second group', parents: ['group1'],
-                            'desc':'Desc recommended but not necessary'}
-                 }
+        Example:
+            'theparser': {'label': "Formatted Long Parser Label",
+                          'desc': "Description of the parser",
+                          'parents': ['root']},
+
+            'group1': {'label': 'The first group',
+                       'parents': ['theparser']},
+
+            'group2': {'label': 'The second group',
+                       'parents': ['group1'],
+                       'desc': "Desc recommended but not necessary"}
+             }
+
         :param debug: Debug flag to print debug output
         :rtype bool:
         """
@@ -93,10 +101,10 @@ class BasicSPParser(object):
                 errors.append("Group '%s' not formatted correctly" % g)
             
             if not isinstance(groups[g], dict):
-                return False
+                errors.append("Group '%s' must be dict" % g)
 
-            if 'name' not in groups[g]:
-                errors.append("Error 'name' not defined for group '%s'" % g)
+            if 'label' not in groups[g]:
+                debug_msg.append("'label' not defined for group '%s'" % g)
         
             if 'desc' not in groups[g]:
                 debug_msg.append("'desc' not defined for group '%s'" % g)
@@ -108,19 +116,27 @@ class BasicSPParser(object):
             if not isinstance(groups[g]['parents'], list):
                 errors.append("Error 'parents' must be a list for group '%s'" % g)
 
-            #Flatten parents
+            #Gather parents
             parents.extend(groups[g]['parents'])
 
-        #Ensure at least one, group has parent root
-        if 'root' not in parents:
+        #Ensure one and only one group has parent root
+        if parents.count('root') != 1:
             errors.append("Error One and only one, group must have a parent 'root'")
-        parents.remove('root')
+
 
         #Except for root, every parents must be in groups
         #TODO should include group of parent in error message
+        parents.remove('root')
         for i in parents:
             if i not in groups:
-                errors.append("Error parent '%s' not in groups" % i)
+                errors.append("Error parent '%s' not in group" % i)
+
+
+        #Ensure theres a group called 'theparser' and it has parent 'root'
+        if (self.cl() not in groups or
+            groups[self.cl()]['parents'] != ['root']):
+                errors.append("One group should eb called after the parser"
+                                            "name and it must have parent 'root'")
 
         if debug:
             for i in debug_msg:
@@ -138,12 +154,17 @@ class BasicSPParser(object):
 
         Ensure var names are all lower case, contain underscores (not dash)
             and the following chars are not permitted "()[]/\ "
-        Ensure every var has a unit
+        Recommend every var has a label
+        Recommend every var has a unit
+        Recommend every var has a description
 
-        Example: {'var1': {'name': 'The first Variable', 'unit': ''},
-                  'var2': {'name': 'The Second Variable', 'unit': 'kB', 
-                            'desc': 'Description recommended but not necessary'}
-                  }
+        Example:
+            'var1': {'label': 'The first Variable'},
+
+            'var2': {'label': 'The Second Variable',
+                     'unit': 'kB', 
+                     'desc': 'Description recommended but not necessary'}
+            }
         :param debug: Debug flag to print debug output
         :rtype bool:
         """
@@ -160,11 +181,11 @@ class BasicSPParser(object):
             if not isinstance(thevars[v], dict):
                 return False
 
-            if 'name' not in thevars[v]:
-                errors.append("Error 'name' not defined for var '%s'" % v)
+            if 'label' not in thevars[v]:
+                debug_msg.append("'label' not defined for var '%s'" % v)
         
             if 'unit' not in thevars[v]:
-                errors.append("Error 'unit' not defined for var '%s'" % v)
+                debug_msg.append("'unit' not defined for var '%s'" % v)
         
             if 'desc' not in thevars[v]:
                 debug_msg.append("'desc' not defined for var '%s'" % v)
@@ -188,21 +209,33 @@ class BasicSPParser(object):
         Ensure all vars are present in the vars dict
         Ensure every value is a string
 
-        Example: {'group1': {
-                            'group2': {'var1': 'val1',
-                                       'var2': 'val2'},
-                            }
-                 }
+        Example:
+            'theparser': {'label': "Formatted Long Parser Label",
+                          'desc': "Description of the parser",
+                          'parents': ['root']},
+
+            'group1': {'label': 'The first group',
+                       'parents': ['theparser']},
+
+            'group2': {'label': 'The second group',
+                       'parents': ['group1'],
+                       'desc': "Desc recommended but not necessary"}
+             }
         :param debug: Debug flag to print debug output
         :rtype bool:
         """
 
         errors = list()
-        debug_msg = ["Validating parser %s" % self.cl()]
+        debug_msg = ["Validating get_data %s" % self.cl()]
 
         groups = self.get_groups().keys()
         thevars = self.get_vars().keys()
         data = self.get_data()
+
+
+        if (len(data.keys()) > 1 or data.get(self.cl(), False)):
+            errors.append("First Level in data should be the class name")
+
 
         #Recursion function to validate and help debug the parser
         def validate_sub(subdata):
@@ -278,6 +311,13 @@ class BasicSPParser(object):
         Helper for the sub classes
         """
         return txt.strip('()[]').replace(' ', '_').replace('-', '_').replace('/', '_').lower()
+
+    @staticmethod
+    def label_format(name):
+        """
+        Helper for the sub classes
+        """
+        return name.replace('_', ' ').title()
 
     def test_parse(self):
         """

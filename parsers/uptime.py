@@ -59,9 +59,10 @@ class UpTime(BasicSPParser):
         stats = dict()
         for l in open(UpTime.UPTIME):
             line = l.split()
-            uptime_data["total"] = line[0]
-            uptime_data["idle"] = line[1]
-        return uptime_data
+
+            uptime_data = {"total": line[0],
+                           "idle":  line[1]}
+        return {'uptime': uptime_data}
 
 if __name__ == "__main__":
     ut = UpTime()

@@ -9,15 +9,12 @@ individual sp_parsers.
 import pprint
 
 
-
-
 class SPParserError(Exception):
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
         return rept(self.value)
-
 
 
 class BasicSPParser(object):
@@ -72,11 +69,22 @@ class BasicSPParser(object):
             and the following chars are not permitted "()[]/\ "
         Ensure each group has a parent, and parents must be list
         Ensure at least one group has parent 'root'
+        Recommend every group has a label
+        Recommend every group has a description
 
-        Example {'group1': {'name': 'The first group', parents: ['root']},
-                 'group2': {'name': 'The second group', parents: ['group1'],
-                            'desc':'Desc recommended but not necessary'}
-                 }
+        Example:
+            'theparser': {'label': "Formatted Long Parser Label",
+                          'desc': "Description of the parser",
+                          'parents': ['root']},
+
+            'group1': {'label': 'The first group',
+                       'parents': ['theparser']},
+
+            'group2': {'label': 'The second group',
+                       'parents': ['group1'],
+                       'desc': "Desc recommended but not necessary"}
+             }
+
         :param debug: Debug flag to print debug output
         :rtype bool:
         """
@@ -96,7 +104,7 @@ class BasicSPParser(object):
                 errors.append("Group '%s' must be dict" % g)
 
             if 'label' not in groups[g]:
-                errors.append("Error 'label' not defined for group '%s'" % g)
+                debug_msg.append("'label' not defined for group '%s'" % g)
         
             if 'desc' not in groups[g]:
                 debug_msg.append("'desc' not defined for group '%s'" % g)
@@ -146,12 +154,17 @@ class BasicSPParser(object):
 
         Ensure var names are all lower case, contain underscores (not dash)
             and the following chars are not permitted "()[]/\ "
-        Ensure every var has a unit
+        Recommend every var has a label
+        Recommend every var has a unit
+        Recommend every var has a description
 
-        Example: {'var1': {'name': 'The first Variable', 'unit': ''},
-                  'var2': {'name': 'The Second Variable', 'unit': 'kB', 
-                            'desc': 'Description recommended but not necessary'}
-                  }
+        Example:
+            'var1': {'label': 'The first Variable'},
+
+            'var2': {'label': 'The Second Variable',
+                     'unit': 'kB', 
+                     'desc': 'Description recommended but not necessary'}
+            }
         :param debug: Debug flag to print debug output
         :rtype bool:
         """
@@ -168,11 +181,11 @@ class BasicSPParser(object):
             if not isinstance(thevars[v], dict):
                 return False
 
-            if 'name' not in thevars[v]:
-                errors.append("Error 'name' not defined for var '%s'" % v)
+            if 'label' not in thevars[v]:
+                debug_msg.append("'label' not defined for var '%s'" % v)
         
             if 'unit' not in thevars[v]:
-                errors.append("Error 'unit' not defined for var '%s'" % v)
+                debug_msg.append("'unit' not defined for var '%s'" % v)
         
             if 'desc' not in thevars[v]:
                 debug_msg.append("'desc' not defined for var '%s'" % v)
@@ -196,11 +209,18 @@ class BasicSPParser(object):
         Ensure all vars are present in the vars dict
         Ensure every value is a string
 
-        Example: {'group1': {
-                            'group2': {'var1': 'val1',
-                                       'var2': 'val2'},
-                            }
-                 }
+        Example:
+            'theparser': {'label': "Formatted Long Parser Label",
+                          'desc': "Description of the parser",
+                          'parents': ['root']},
+
+            'group1': {'label': 'The first group',
+                       'parents': ['theparser']},
+
+            'group2': {'label': 'The second group',
+                       'parents': ['group1'],
+                       'desc': "Desc recommended but not necessary"}
+             }
         :param debug: Debug flag to print debug output
         :rtype bool:
         """

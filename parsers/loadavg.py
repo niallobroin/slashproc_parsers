@@ -18,7 +18,6 @@ class LoadAvg(BasicSPParser):
     def get_groups():
         """
         Static method to define vars that that parser can parse
-        #Will probably be a class later.
         """
         groups = {
             'loadavg': {'label': 'CPU Load Average', 'parents': ['root']}, 
@@ -29,7 +28,6 @@ class LoadAvg(BasicSPParser):
     def get_vars():
         """
         Static method to define vars that that parser can parse
-        #Will probably be a class later.
         """
         parents = ['loadavg']
         thevars = {'loadavg_1min': {'label': "cpu and IO utilisation of the last 1 min",
@@ -58,11 +56,11 @@ class LoadAvg(BasicSPParser):
         with open(LoadAvg.PROC, 'r') as f:
             a = f.read().split()
 
-        return {'loadavg':{'loadavg_1min': a[0],
-                           'loadavg_5mins': a[1],
-                           'loadavg_10mins': a[2],
-                           'curr_num_proc_over_tot': a[3],
-                           'last_proc_id_used': a[4],
+        return {'loadavg': {'loadavg_1min': a[0],
+                            'loadavg_5mins': a[1],
+                            'loadavg_10mins': a[2],
+                            'curr_num_proc_over_tot': a[3],
+                            'last_proc_id_used': a[4],
                }}
 
 

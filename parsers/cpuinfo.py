@@ -17,7 +17,7 @@ class CpuInfo(BasicSPParser):
         Enumerate the groups depending on the number of cores
         :rtype dict
         """
-        groups =  {'cpuinfo': {'label': 'cpuinfo', 'parents': ['root'] }}
+        groups =  {'cpuinfo': {'label': 'CPU Information', 'parents': ['root'] }}
 
         for i in CpuInfo.get_data()['cpuinfo']:
             groups[CpuInfo.key_format(i)] = {'label': i, 'parents': ['cpuinfo']}
@@ -62,6 +62,8 @@ class CpuInfo(BasicSPParser):
             if i not in thevars:
                 thevars[CpuInfo.key_format(i)] = {'label': i,
                                                   'parents': parents}
+            else:
+                thevars[i]['parents'] = parents
 
         return thevars
 
@@ -72,7 +74,7 @@ class CpuInfo(BasicSPParser):
         Parse /proc/cpuinfo
         :rtype dict
         """
-        data = {'cpuinfo': dict()}
+        data = dict()
         for l in open(CpuInfo.CPUINFO):
             line = l.split(':')
 
@@ -82,14 +84,14 @@ class CpuInfo(BasicSPParser):
                 v = line[1].strip().replace('\t','').replace('\n','')
                 if k == 'processor':
                     processor_num =  'core' + v
-                    data['cpuinfo'][processor_num] = dict()
+                    data[processor_num] = dict()
 
 
-                data['cpuinfo'][processor_num][k] = v
+                data[processor_num][k] = v
                 if k == 'cache_size':
-                    data['cpuinfo'][processor_num]['cache_size'] = v.strip()[0]
+                    data[processor_num]['cache_size'] = v.strip()[0]
 
-        return data
+        return {'cpuinfo': data}
 
 
 if __name__ == "__main__":

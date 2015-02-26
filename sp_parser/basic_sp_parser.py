@@ -93,10 +93,10 @@ class BasicSPParser(object):
                 errors.append("Group '%s' not formatted correctly" % g)
             
             if not isinstance(groups[g], dict):
-                return False
+                errors.append("Group '%s' must be dict" % g)
 
-            if 'name' not in groups[g]:
-                errors.append("Error 'name' not defined for group '%s'" % g)
+            if 'label' not in groups[g]:
+                errors.append("Error 'label' not defined for group '%s'" % g)
         
             if 'desc' not in groups[g]:
                 debug_msg.append("'desc' not defined for group '%s'" % g)
@@ -108,19 +108,27 @@ class BasicSPParser(object):
             if isinstance(groups[g]['parents'], list):
                 errors.append("Error 'parents' must be a list for group '%s'" % g)
 
-            #Flatten parents
+            #Gather parents
             parents.extend(groups[g]['parents'])
 
-        #Ensure at least one, group has parent root
-        if 'root' not in parents:
+        #Ensure one and only one group has parent root
+        if parents.count('root') != 1:
             errors.append("Error One and only one, group must have a parent 'root'")
-        parents.remove('root')
+
 
         #Except for root, every parents must be in groups
         #TODO should include group of parent in error message
+        parents.remove('root')
         for i in parents:
             if i not in groups:
-                errors.append("Error parent '%s' not in groups" % i)
+                errors.append("Error parent '%s' not in group" % i)
+
+
+        #Ensure theres a group called 'theparser' and it has parent 'root'
+        if (self.cl() not in groups or
+            groups[self.cl()]['parents'] != ['root']):
+                errors.append("One group should eb called after the parser"
+                                            "name and it must have parent 'root'")
 
         if debug:
             for i in debug_msg:
@@ -198,11 +206,16 @@ class BasicSPParser(object):
         """
 
         errors = list()
-        debug_msg = ["Validating parser %s" % self.cl()]
+        debug_msg = ["Validating get_data %s" % self.cl()]
 
         groups = self.get_groups().keys()
         thevars = self.get_vars().keys()
         data = self.get_data()
+
+
+        if (len(data.keys()) > 1 or data.get(self.cl(), False)):
+            errors.append("First Level in data should be the class name")
+
 
         #Recursion function to validate and help debug the parser
         def validate_sub(subdata):
@@ -277,6 +290,13 @@ class BasicSPParser(object):
         Helper for the sub classes
         """
         return txt.strip('()[]').replace(' ', '_').replace('-', '_').replace('/', '_').lower()
+
+    @staticmethod
+    def label_format(name):
+        """
+        Helper for the sub classes
+        """
+        return name.replace('_', ' ').title()
 
     def test_parse(self):
         """

@@ -2,7 +2,7 @@
 """
 The Base class for every sp_parser
 
-This is primarily to help Developers write and test 
+This is primarily to help Developers write and test
 individual sp_parsers.
 
 """
@@ -102,7 +102,7 @@ class BasicSPParser(object):
     def validate_groups(self, debug=False):
         """
         This method may be called by other classes to ensure the test_parser
-        is returning correctly formatted results. 
+        is returning correctly formatted results.
 
         Ensure group names are unique
             if there are multiple then subscript with number etc...
@@ -145,7 +145,7 @@ class BasicSPParser(object):
 
             if 'label' not in groups[g]:
                 debug_msg.append(MSG.debug(11, g))
-        
+
             if 'desc' not in groups[g]:
                 debug_msg.append(MSG.debug(7, g))
 
@@ -161,7 +161,7 @@ class BasicSPParser(object):
 
          #Ensure one and only one group has parent root
         if parents.count('root') != 1:
-             errors.append("Error One and only one, group must have a parent 'root'")
+            errors.append(MSG.err(8))
 
         #Except for root, every parents must be in groups
         #TODO should include group of parent in error message
@@ -173,7 +173,7 @@ class BasicSPParser(object):
         #Ensure theres a group called 'theparser' and it has parent 'root'
         if (self.cl() not in groups or
             groups[self.cl()]['parents'] != ['root']):
-                errors.append(MSG.err(16))
+            errors.append(MSG.err(16))
 
 
         if debug:
@@ -184,12 +184,10 @@ class BasicSPParser(object):
 
         return False if errors else True
 
-    
-
     def validate_vars(self, debug=False):
         """
         This method may be called by other classes to ensure the test_parser
-        is returning correctly formatted results. 
+        is returning correctly formatted results.
 
         Ensure var names are all lower case, contain underscores (not dash)
             and the following chars are not permitted "()[]/\ "
@@ -201,7 +199,7 @@ class BasicSPParser(object):
             'var1': {'label': 'The first Variable'},
 
             'var2': {'label': 'The Second Variable',
-                     'unit': 'kB', 
+                     'unit': 'kB',
                      'desc': 'Description recommended but not necessary'}
             }
         :param debug: Debug flag to print debug output
@@ -223,12 +221,12 @@ class BasicSPParser(object):
 
             if 'label' not in thevars[v]:
                 debug_msg.append(MSG.debug(9, v))
-        
+
             if 'unit' not in thevars[v]:
                 debug_msg.append(MSG.debug(10, v))
-        
+
             if 'desc' not in thevars[v]:
-                debug_msg.append(MSG.debug(8,v))
+                debug_msg.append(MSG.debug(8, v))
 
         if debug:
             for i in debug_msg:
@@ -272,7 +270,7 @@ class BasicSPParser(object):
         thevars = self.get_vars().keys()
         data = self.get_data()
 
-        if (len(data.keys()) > 1 or data.get(self.cl(), False)):
+        if len(data.keys()) > 1 or data.get(self.cl(), False):
             errors.append(MSG.err(16))
 
         #Recursion function to validate and help debug the parser
@@ -283,7 +281,7 @@ class BasicSPParser(object):
                     errors.append(MSG.err(1))
 
                 if isinstance(subdata[k], dict) and k not in groups:
-                    errors.append(MSG.err(2,k))
+                    errors.append(MSG.err(2, k))
 
                 elif isinstance(subdata[k], dict) and k in groups:
                     debug_msg.append(MSG.debug(2, k))

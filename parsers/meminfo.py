@@ -40,10 +40,10 @@ class MemInfo(BasicSPParser):
             'writeback': {'label': "Writeback", 'desc': "The total amount of memory, in kilobytes, actively being written back to the disk."},
             'mapped': {'label': "Mapped", 'desc': "The total amount of memory, in kilobytes, which have been used to map devices, files, or libraries using the mmap command."},
             'slab': {'label': "Slab", 'desc': "The total amount of memory, in kilobytes, used by the kernel to cache data structures for its own use."},
-            'committed_as': {'label': "Committed_AS", 'desc': "The total amount of memory, in kilobytes, estimated to complete the workload. This value represents the worst case scenario value, and also includes swap memory.
+            'committed_as': {'label': "Committed_AS", 'desc': "The total amount of memory, in kilobytes, estimated to complete the workload. This value represents the worst case scenario value, and also includes swap memory."},
             'pagetables': {'label': "PageTables", 'desc': "The total amount of memory, in kilobytes, dedicated to the lowest page table level."},
             'vmalloctotal': {'label': "VMallocTotal", 'desc': "The total amount of memory, in kilobytes, of total allocated virtual address space."},
-            'vmallocused': {'label': "VMallocUsed", 'desc': "The total amount of memory, in kilobytes, of used virtual address space.
+            'vmallocused': {'label': "VMallocUsed", 'desc': "The total amount of memory, in kilobytes, of used virtual address space."},
             'vmallocchunk': {'label': "VMallocChunk", 'desc': "The largest contiguous block of memory, in kilobytes, of available virtual address space."},
             'hugepages_total': {'label': "HugePages_Total", 'desc': "The total number of hugepages for the system. The number is derived by dividing Hugepagesize by the megabytes set aside for hugepages specified in /proc/sys/vm/hugetlb_pool. This statistic only appears on the x86, Itanium, and AMD64 architectures."},
             'hugepages_free': {'label': "HugePages_Free", 'desc': "The total number of hugepages available for the system. This statistic only appears on the x86, Itanium, and AMD64 architectures."},

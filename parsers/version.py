@@ -72,5 +72,5 @@ class Version(BasicSPParser):
         return {'version': version_data}
 
 if __name__ == "__main__":
-    ut = Version()
-    ut.test_parse()
+    ve = Version()
+    ve.test_parse()

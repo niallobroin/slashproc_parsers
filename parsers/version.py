@@ -30,28 +30,33 @@ class Version(BasicSPParser):
 
             Returns: thevars (dict): variables
         """
-        retdict = Version.get_data()
-        thevars = dict()
-        for i in retdict.keys():
-            thevars[Version.key_format(i)] = {
-                'label': i,
-                'unit': '',
-                'parents': ['version']
-            }
+        thevars = {
+                'ker_ver': {'desc': "Exact version of the Linux kernel used in the OS",
+                          'label': 'Kernel Version',
+                          'unit': '',
+                          'parents': ['version'],},
 
-        descs = {
-            ('ker_ver', 'Exact version of the Linux kernel used in the OS.', ''),
-            ('user', 'Name of the user who compiled the kernel, and also a host name where it happened.', '')
-            ('gcc_ver', 'Version of the GCC compiler used for building the kernel.', '')
-            ('redhat_ver', 'RedHat version.', '')
-            ('ker_type', 'Type of the kernel. SMP indicates Symmetric MultiProcessing.', '')
-            ('ker_date', 'Date and time when the kernel was built.', '')
-        }
-
-        for var, desc, unit in descs:
-            if var in thevars:
-                thevars[var]['desc'] = desc
-                thevars[var]['unit'] = unit
+                'user': {'desc': "Name of the user who compiled the kernel, and also a host name where it happened",
+                         'label': 'Username, hostname',
+                         'unit': '',
+                         'parents': ['version'],},
+				'gcc_ver': {'desc': "Version of the GCC compiler used for building the kernel",
+                         'label': 'GCC Version',
+                         'unit': '',
+                         'parents': ['version'],},
+				'redhat_ver': {'desc': "RedHat version",
+                         'label': 'RedHat Version',
+                         'unit': '',
+                         'parents': ['version'],},
+				'ker_type': {'desc': "Type of the kernel. SMP indicates Symmetric MultiProcessing",
+                         'label': 'Kernel Type',
+                         'unit': '',
+                         'parents': ['version'],},
+				'ker_date': {'desc': "Date and time when the kernel was built",
+                         'label': 'Date of compilation',
+                         'unit': '',
+                         'parents': ['version'],},
+                }
         return thevars
 
     @staticmethod
@@ -60,9 +65,9 @@ class Version(BasicSPParser):
 
             Returns: stats (dict): dictionary with variables and their values
         """
-        stats = dict()
         for l in open(Version.VERSION):
             line = l.split('(')
+
             version_data = {"ker_ver" : line[0].strip().replace('Linux version ', ''),
                             "user" : line[1].strip().replace(')', ''),
                             "gcc_ver" : line[2].strip().replace('gcc version ', ''),
@@ -72,5 +77,5 @@ class Version(BasicSPParser):
         return {'version': version_data}
 
 if __name__ == "__main__":
-    ve = Version()
-    ve.test_parse()
+    ut = Version()
+    ut.test_parse()

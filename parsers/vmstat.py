@@ -91,8 +91,11 @@ class VmStat(BasicSPParser):
         }
 
         for var, desc, unit in descs:
-            thevars[var]['desc'] = desc
-            thevars[var]['unit'] = unit
+            try:
+                thevars[var]['desc'] = desc
+                thevars[var]['unit'] = unit
+            except KeyError:
+                pass
         return thevars
 
     @staticmethod
@@ -106,8 +109,7 @@ class VmStat(BasicSPParser):
 
     @staticmethod
     def parse_vmstat():
-        """
-        Parse /proc/vmstat. All variables are stored in single group.
+        """Parse /proc/vmstat. All variables are stored in single group.
 
         Returns:
             stats (dict): dictionary with variables and their values

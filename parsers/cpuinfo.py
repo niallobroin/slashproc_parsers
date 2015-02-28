@@ -18,7 +18,7 @@ class CpuInfo(BasicSPParser):
         :rtype dict
         """
         retdict = CpuInfo.parse_cpuinfo()
-        groups =  {'core': {'name': 'cpuinfo', 'parents': ['root']}}
+        groups = {'core': {'name': 'cpuinfo', 'parents': ['root']}}
 
         for i in retdict['core']:
             groups[CpuInfo.key_format(i)] = {'name': i, 'parents': ['core']}

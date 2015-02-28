@@ -36,7 +36,7 @@ class Version(BasicSPParser):
                           'unit': '',
                           'parents': ['version'],},
 
-                'user': {'desc': "Name of the user who compiled the kernel, and also a host name where it happened",
+                'user': {'desc': "User who compiled the kernel, host name where it happened",
                          'label': 'Username, hostname',
                          'unit': '',
                          'parents': ['version'],},
@@ -68,12 +68,12 @@ class Version(BasicSPParser):
         for l in open(Version.VERSION):
             line = l.split('(')
 
-            version_data = {"ker_ver" : line[0].strip().replace('Linux version ', ''),
-                            "user" : line[1].strip().replace(')', ''),
-                            "gcc_ver" : line[2].strip().replace('gcc version ', ''),
-                            "redhat_ver" : line[3].split('))')[0],
-                            "ker_type" : " ".join(line[3].split('))')[1].split(' ')[1:3]),
-                            "ker_date" : " ".join(line[3].split('))')[1].split(' ')[3:len(line[3])])}
+            version_data = {"ker_ver": line[0].strip().replace('Linux version ', ''),
+                            "user": line[1].strip().replace(')', ''),
+                            "gcc_ver": line[2].strip().replace('gcc version ', ''),
+                            "redhat_ver": line[3].split('))')[0],
+                            "ker_type": " ".join(line[3].split('))')[1].split(' ')[1:3]),
+                            "ker_date": " ".join(line[3].split('))')[1].split(' ')[3:len(line[3])])}
         return {'version': version_data}
 
 if __name__ == "__main__":

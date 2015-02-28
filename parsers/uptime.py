@@ -49,7 +49,6 @@ class UpTime(BasicSPParser):
 
             Returns: stats (dict): dictionary with variables and their values
         """
-        stats = dict()
         for l in open(UpTime.UPTIME):
             line = l.split()
 

@@ -18,35 +18,31 @@ class LoadAvg(BasicSPParser):
     def get_groups():
         """
         Static method to define vars that that parser can parse
-        #Will probably be a class later.
         """
-        GROUPS = {
-            'loadavg': {'name': 'CPU', 'parents': ['root']}, 
+        groups = {
+            'loadavg': {'label': 'CPU Load Average', 'parents': ['root']}, 
                 }
-        return GROUPS
+        return groups
         
     @staticmethod
     def get_vars():
         """
         Static method to define vars that that parser can parse
-        #Will probably be a class later.
         """
         parents = ['loadavg']
-        thevars = {'loadavg_1min': {'name': "cpu and IO utilisation of the last 1 min",
+        thevars = {'loadavg_1min': {'label': "cpu and IO utilisation of the last 1 min",
                                     'parents': parents,
                                     'unit': '%'},
-                   'loadavg_5mins': {'name': "cpu and IO utilisation of the last 5 mins",
+                   'loadavg_5mins': {'label': "cpu and IO utilisation of the last 5 mins",
                                        'parents': parents,
                                        'unit': '%'},
-                   'loadavg_10mins': {'name': "cpu and IO utilisation of last 10 mins",
+                   'loadavg_10mins': {'label': "cpu and IO utilisation of last 10 mins",
                                        'parents': parents,
                                        'unit': '%'},
-                   'curr_num_proc_over_tot': {'name': "Current number of Processes / Total number of processes",
-                                       'parents': parents,
-                                       'unit': '%'},
-                   'last_proc_id_used': {'name': "Last Process ID used",
-                                       'parents': parents,
-                                       'unit': '%'},
+                   'curr_num_proc_over_tot': {'label': "Current number of Processes / Total number of processes",
+                                       'parents': parents},
+                   'last_proc_id_used': {'label': "Last Process ID used",
+                                       'parents': parents},
                                        
                    }
             
@@ -57,19 +53,19 @@ class LoadAvg(BasicSPParser):
         """
 
         """
-        with open(Load.PROC, 'r') as f:
+        with open(LoadAvg.PROC, 'r') as f:
             a = f.read().split()
 
-        return {'loadavg':{'loadavg_1min': a[0],
-                           'loadavg_5mins': a[1],
-                           'loadavg_10mins': a[2],
-                           'curr_num_proc_over_tot': a[3],
-                           'last_proc_id_used': a[4],
+        return {'loadavg': {'loadavg_1min': a[0],
+                            'loadavg_5mins': a[1],
+                            'loadavg_10mins': a[2],
+                            'curr_num_proc_over_tot': a[3],
+                            'last_proc_id_used': a[4],
                }}
 
 
 
 
 if __name__ == "__main__":
-    c = Load()
+    c = LoadAvg()
     c.test_parse()

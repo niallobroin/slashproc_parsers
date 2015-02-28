@@ -9,8 +9,6 @@ individual sp_parsers.
 import pprint
 
 
-
-
 class SPParserError(Exception):
     def __init__(self, value):
         self.value = value
@@ -18,6 +16,45 @@ class SPParserError(Exception):
     def __str__(self):
         return repr(self.value)
 
+class MSG(object):
+    debug1 = "Validating parser %s"
+    debug2 = "Found group '%s'"
+    debug3 = "Calling Recursive again"
+    debug4 = "Found Variable %s"
+    debug5 = "Starting Recursion"
+    debug6 = "Validating Groups"
+    debug7 = "'desc' not defined for group '%s'"
+    debug8 = "'desc' not defined for var '%s'"
+    debug9 = "Recommend 'label' not defined for var '%s'"
+    debug10 = "Recommend 'unit' not defined for var '%s'"
+
+    err1 = "Error key format does not confirm"
+    err2 = "Error group '%s' not found"
+    err3 = "Variable '%s' not found"
+    err4 = "Group '%s' not formatted correctly"
+    err5 = "Error 'name' not defined for group '%s'"
+    err6 = "Error 'parents' not defined for group '%s'"
+    err7 = "Error 'parents' must be a list for group '%s'"
+    err8 = "Error One and only one, group must have a parent 'root'"
+    err9 = "Error parent '%s' not in groups"
+    err10 = "Var '%s' not formatted correctly"
+
+
+    err13 = "Group '%s' must be dict"
+    err14 = "get_var must return a dict"
+    err15 = "First Level in data should be the class name"
+    err16 = ("One group should be called after the parser"
+                            "name and it must have parent 'root'")
+
+    @classmethod
+    def debug(cls, num, param=''):
+        msg = getattr(cls, 'debug%s' % num)
+        return msg % param if '%s' in msg else msg
+
+    @classmethod
+    def err(cls, num, param=''):
+        msg = getattr(cls, 'err%s' % num)
+        return msg % param if '%s' in msg else msg
 
 
 class BasicSPParser(object):
@@ -72,17 +109,27 @@ class BasicSPParser(object):
             and the following chars are not permitted "()[]/\ "
         Ensure each group has a parent, and parents must be list
         Ensure at least one group has parent 'root'
+        Recommend every group has a label
+        Recommend every group has a description
 
-        Example {'group1': {'name': 'The first group', parents: ['root']},
-                 'group2': {'name': 'The second group', parents: ['group1'],
-                            'desc':'Desc recommended but not necessary'}
-                 }
+        Example:
+            'theparser': {'label': "Formatted Long Parser Label",
+                          'desc': "Description of the parser",
+                          'parents': ['root']},
+
+            'group1': {'label': 'The first group',
+                       'parents': ['theparser']},
+
+            'group2': {'label': 'The second group',
+                       'parents': ['group1'],
+                       'desc': "Desc recommended but not necessary"}
+             }
+
         :param debug: Debug flag to print debug output
         :rtype bool:
         """
         errors = list()
-        debug_msg = ["Validating Groups"]
-
+        debug_msg = [MSG.debug(6)]
         groups = self.get_groups()
         if not isinstance(groups, dict):
             return False
@@ -90,37 +137,43 @@ class BasicSPParser(object):
         parents = list()
         for g in groups:
             if g != self.key_format(g):
-                errors.append("Group '%s' not formatted correctly" % g)
-            
-            if not isinstance(groups[g], dict):
-                return False
+                errors.append(MSG.err(4, g))
 
-            if 'name' not in groups[g]:
-                errors.append("Error 'name' not defined for group '%s'" % g)
+            if not isinstance(groups[g], dict):
+                errors.append(MSG.err(13, g))
+
+            if 'label' not in groups[g]:
+                errors.append(MSG.err(5, g))
         
             if 'desc' not in groups[g]:
-                debug_msg.append("'desc' not defined for group '%s'" % g)
+                debug_msg.append(MSG.debug(7, g))
 
             if 'parents' not in groups[g]:
-                errors.append("Error 'parents' not defined for group '%s'" % g)
+                errors.append(MSG.err(6, g))
 
             #parents must be list
             if not isinstance(groups[g]['parents'], list):
-                errors.append("Error 'parents' must be a list for group '%s'" % g)
+                errors.append(MSG.err(7, g))
 
-            #Flatten parents
+            #Gather parents
             parents.extend(groups[g]['parents'])
 
-        #Ensure at least one, group has parent root
-        if 'root' not in parents:
-            errors.append("Error One and only one, group must have a parent 'root'")
-        parents.remove('root')
+         #Ensure one and only one group has parent root
+        if parents.count('root') != 1:
+             errors.append("Error One and only one, group must have a parent 'root'")
 
         #Except for root, every parents must be in groups
         #TODO should include group of parent in error message
+        parents.remove('root')
         for i in parents:
             if i not in groups:
-                errors.append("Error parent '%s' not in groups" % i)
+                errors.append(MSG.err(9, i))
+
+        #Ensure theres a group called 'theparser' and it has parent 'root'
+        if (self.cl() not in groups or
+            groups[self.cl()]['parents'] != ['root']):
+                errors.append(MSG.err(16))
+
 
         if debug:
             for i in debug_msg:
@@ -129,6 +182,7 @@ class BasicSPParser(object):
                 print i
 
         return False if errors else True
+
     
 
     def validate_vars(self, debug=False):
@@ -138,36 +192,42 @@ class BasicSPParser(object):
 
         Ensure var names are all lower case, contain underscores (not dash)
             and the following chars are not permitted "()[]/\ "
-        Ensure every var has a unit
+        Recommend every var has a label
+        Recommend every var has a unit
+        Recommend every var has a description
 
-        Example: {'var1': {'name': 'The first Variable', 'unit': ''},
-                  'var2': {'name': 'The Second Variable', 'unit': 'kB', 
-                            'desc': 'Description recommended but not necessary'}
-                  }
+        Example:
+            'var1': {'label': 'The first Variable'},
+
+            'var2': {'label': 'The Second Variable',
+                     'unit': 'kB', 
+                     'desc': 'Description recommended but not necessary'}
+            }
         :param debug: Debug flag to print debug output
         :rtype bool:
         """
         errors = list()
         debug_msg = ["Validating Vars"]
-
         thevars = self.get_vars()
+
         if not isinstance(thevars, dict):
-            return False
+            errors.append(MSG.err(14, g))
+
         for v in thevars:
             if v != self.key_format(v):
-                errors.append("Var '%s' not formatted correctly" % v)
+                errors.append(MSG.err(10, v))
 
             if not isinstance(thevars[v], dict):
-                return False
+                errors.append(MSG.err(15, g))
 
-            if 'name' not in thevars[v]:
-                errors.append("Error 'name' not defined for var '%s'" % v)
+            if 'label' not in thevars[v]:
+                debug_msg.append(MSG.debug(9, v))
         
             if 'unit' not in thevars[v]:
-                errors.append("Error 'unit' not defined for var '%s'" % v)
+                debug_msg.append(MSG.debug(10, v))
         
             if 'desc' not in thevars[v]:
-                debug_msg.append("'desc' not defined for var '%s'" % v)
+                debug_msg.append(MSG.debug(8,v))
 
         if debug:
             for i in debug_msg:
@@ -188,53 +248,60 @@ class BasicSPParser(object):
         Ensure all vars are present in the vars dict
         Ensure every value is a string
 
-        Example: {'group1': {
-                            'group2': {'var1': 'val1',
-                                       'var2': 'val2'},
-                            }
-                 }
+        Example:
+            'theparser': {'label': "Formatted Long Parser Label",
+                          'desc': "Description of the parser",
+                          'parents': ['root']},
+
+            'group1': {'label': 'The first group',
+                       'parents': ['theparser']},
+
+            'group2': {'label': 'The second group',
+                       'parents': ['group1'],
+                       'desc': "Desc recommended but not necessary"}
+             }
         :param debug: Debug flag to print debug output
         :rtype bool:
         """
 
         errors = list()
-        debug_msg = ["Validating parser %s" % self.cl()]
+        debug_msg = [MSG.debug(1, self.cl())]
 
         groups = self.get_groups().keys()
         thevars = self.get_vars().keys()
         data = self.get_data()
 
+        if (len(data.keys()) > 1 or data.get(self.cl(), False)):
+            errors.append(MSG.err(14))
+
         #Recursion function to validate and help debug the parser
         def validate_sub(subdata):
 
             for k in subdata.keys():
-
                 if k != self.key_format(k):
-                    errors.append("Error key format does not confirm")
+                    errors.append(MSG.err(1))
 
                 if isinstance(subdata[k], dict) and k not in groups:
-                    errors.append("Error group '%s' not found" % k)
+                    errors.append(MSG.err(2,k))
 
                 elif isinstance(subdata[k], dict) and k in groups:
-
-                    debug_msg.append("Found group '%s'" % k)
+                    debug_msg.append(MSG.debug(2, k))
                     groups.remove(k)
 
-                    debug_msg.append("Calling Recursive again")
+                    debug_msg.append(MSG.debug(3))
                     validate_sub(subdata[k])
-            
+
                 elif isinstance(k, str) and k not in thevars:
-                    errors.append("Variable '%s' not found" % k)
+                    errors.append(MSG.err(3, k))
 
                 elif isinstance(k, str) and k in thevars:
-                    debug_msg.append("Found Variable %s" % k)
+                    debug_msg.append(MSG.debug(4, k))
                 else:
                     raise Exception
 
         #Call the rucursion function above
-        debug_msg.append("Starting Recursion")
+        debug_msg.append(MSG.debug(5))
         validate_sub(data)
-
         if debug:
             for i in debug_msg:
                 print i
@@ -278,6 +345,13 @@ class BasicSPParser(object):
         Helper for the sub classes
         """
         return txt.strip('()[]').replace(' ', '_').replace('-', '_').replace('/', '_').lower()
+
+    @staticmethod
+    def label_format(name):
+        """
+        Helper for the sub classes
+        """
+        return name.replace('_', ' ').title()
 
     def test_parse(self):
         """

@@ -30,27 +30,32 @@ class CmdLine(BasicSPParser):
 
             Returns: thevars (dict): variables
         """
-        retdict = CmdLine.get_data()
-        thevars = dict()
-        for i in retdict.keys():
-            thevars[CmdLine.key_format(i)] = {
-                'label': i,
-                'unit': '',
-                'parents': ['cmdline']
-            }
+        thevars = {
+                'ro': {'desc': "Indicates that the kernel is mounted read-only",
+                       'label': 'Read Only',
+                       'unit': '',
+                       'parents': ['cmdline'],},
 
-        descs = {
-            ('ro', 'Indicates that the kernel is mounted read-only.', ''),
-            ('root', 'Location of the root filesystem image.', ''),
-            ('rhgb', 'Red Hat Graphical Boot. Indicates that graphical booting is supported', ''),
-            ('quiet', '', 'Indicates that all verbose kernel messages except those which are extremely serious should be suppressed at boot time.'),
-            ('spare', '', 'Spare')
-        }
-
-        for var, desc, unit in descs:
-            if var in thevars:
-                thevars[var]['desc'] = desc
-                thevars[var]['unit'] = unit
+                'root': {'desc': "Location of the root filesystem image",
+                         'label': 'Root directory',
+                         'unit': '',
+                         'parents': ['cmdline'],},
+                
+                'rhgb': {'desc': "Red Hat Graphical Boot. Graphical booting is supported",
+                         'label': 'Graphical Boot',
+                         'unit': '',
+                         'parents': ['cmdline'],},
+                
+                'quiet': {'desc': "All verbose kernel messages except extremely serious should be suppressed at boot time",
+                         'label': 'Suppress boot messages',
+                         'unit': '',
+                         'parents': ['cmdline'],},
+                
+                'spare': {'desc': "Spare",
+                         'label': 'Spare',
+                         'unit': '',
+                         'parents': ['cmdline'],},
+                }
         return thevars
 
     @staticmethod
@@ -59,15 +64,14 @@ class CmdLine(BasicSPParser):
 
             Returns: stats (dict): dictionary with variables and their values
         """
-        stats = dict()
         for l in open(CmdLine.CMDLINE):
             line = l.split()
 
             cmdline_data = {"ro": line[0],
-                            "root":  line[1].strip().replace('root=', ''),
-                            "rhgb":  line[2],
-                            "quiet":  line[3],
-                            "spare":  line[4]}
+                            "root": line[1].strip().replace('root=', ''),
+                            "rhgb": line[2],
+                            "quiet": line[3],
+                            "spare": line[4]}
         return {'cmdline': cmdline_data}
 
 if __name__ == "__main__":

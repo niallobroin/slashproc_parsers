@@ -3,8 +3,8 @@
 import re
 import os
 import glob
-from collections import defaultdict
 from itertools import chain
+from collections import defaultdict
 from sp_parser.basic_sp_parser import BasicSPParser
 
 
@@ -22,11 +22,14 @@ class PidStatus(BasicSPParser):
         Returns:
             retdict (dict):
         """
-        retdict = PidStatus.parse_pidstatus()
-        groups = {'pid': {'name': 'pisstatus', 'parents': ['root']}}
+
+        # TODO: get_data was refactored, need to make changes here
+
+        retdict = PidStatus.parse_pidstatus(mode='flat')
+        groups = {'pidstatus': {'label': 'pidstatus', 'parents': ['root']}}
 
         for i in retdict['pid']:
-            groups[PidStatus.key_format(i)] = {'name': i, 'parents': ['pid']}
+            groups[PidStatus.key_format(i)] = {'label': i, 'parents': ['pid']}
 
         return groups
 
@@ -41,7 +44,7 @@ class PidStatus(BasicSPParser):
             thevars (dict):
         """
 
-        retdict = PidStatus.parse_pidstatus()
+        retdict = PidStatus.parse_pidstatus(mode='flat')
         processes = retdict['pid'].keys()
         parents = defaultdict(set)
 
@@ -103,12 +106,27 @@ class PidStatus(BasicSPParser):
         return PidStatus.parse_pidstatus()
 
     @staticmethod
-    def parse_pidstatus():
+    def parse_pidstatus(mode='all'):
         """Parse /proc/[pid]/status for each process
 
+        Result is grouped into pstree-like format. So each group name is PID
+        number and each subgroup name also PID number that is connected with
+        outer number with parent-child relation.
+
+        Arguments:
+            mode (str): how status should be processed
+
+                all -
+                flat -
+                relations_only -
         """
-        retdict = {'pid': dict()}
+
+        if mode not in ('flat', 'relations_only', 'all'):
+            raise ValueError('incorrect processing mode')
+
         tabs = re.compile('\s+')
+        processes_plain = {'pid': dict()}
+        processes_relations = defaultdict(list)
 
         for status in glob.iglob(PidStatus.PID):
             pid = status.split(os.sep)[2]
@@ -120,9 +138,31 @@ class PidStatus(BasicSPParser):
                 k, v = parts[0], ' '.join(parts[1:])
                 entries[PidStatus.key_format(k)] = v
 
-            retdict['pid'][pid] = entries
+            processes_plain['pid'][pid] = entries
+            processes_relations[entries['ppid']].append(pid)
 
-        return retdict
+        if mode == 'flat':
+            return processes_plain
+
+        # used to create hierarchical groups
+        def traverse(root, subtree):
+            current_layer = dict()
+            for child in processes_relations[root]:
+                traverse(child, current_layer)
+            if mode == 'all':
+                current_layer.update(processes_plain['pid'][root])
+            current_layer['parents'] = [processes_plain['pid'][root]['ppid']]
+            subtree[root] = current_layer
+
+        tree, layer = {'pid': dict()}, dict()
+        for c in processes_relations['0']:
+            traverse(c, layer)
+
+        tree['pid']['0'] = layer
+
+
+
+        return tree
 
 
 if __name__ == "__main__":

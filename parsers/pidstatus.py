@@ -17,16 +17,19 @@ class PidStatus(BasicSPParser):
 
     @staticmethod
     def get_groups():
-        """Enumerate groups depending on number of processes in current session
+        """Enumerates groups depending on number of processes in current session.
+
+        Each PID is converted into group and its status values - into variables.
+        Children processes are treated as subgroups of their parent process group.
 
         Returns:
-            retdict (dict):
+            retdict (dict): PID groups
         """
 
         # TODO: get_data was refactored, need to make changes here
 
-        retdict = PidStatus.parse_pidstatus(mode='flat')
-        groups = {'pidstatus': {'label': 'pidstatus', 'parents': ['root']}}
+        retdict = PidStatus.parse_pidstatus(mode='relations_only')
+        groups = {'pid': {'label': 'pidstatus', 'parents': ['root']}}
 
         for i in retdict['pid']:
             groups[PidStatus.key_format(i)] = {'label': i, 'parents': ['pid']}
@@ -59,12 +62,12 @@ class PidStatus(BasicSPParser):
             for key in all_keys:
 
                 thevars[PidStatus.key_format(key)] = {
-                    'name': key,
+                    'label': key,
                     'unit': '',
                     'parents': list(parents[key])
                 }
 
-        # is not used yet
+        # TODO: fill missing description (and maybe variables too)
         descs = [
             ('Name', 'Command run by this process', ''),
             ('State', 'Current state of the process', ''),
@@ -94,15 +97,29 @@ class PidStatus(BasicSPParser):
                      'process.  The first of these is the number of currently '
                      'queued signals for this real user ID, and the second is the '
                      'resource limit on the number of queued signals for this process', ''),
-            ('', '', ''),
-            ('', '', ''),
-            ('', '', ''),
+            ('SigPnd', '', ''),
+            ('ShdPnd', '', ''),
+            ('SigBlk', '', ''),
+            ('SigIgn', '', ''),
+            ('SigCat', '', ''),
+            ('CapInh', '', ''),
+            ('CapPrm', '', ''),
+            ('CapEff', '', ''),
+            ('CapBnd', '', ''),
+            ('Seccomp', '', ''),
+            ('Cpus_allowed', '', ''),
+            ('Cpus_allowed_list', '', ''),
+            ('Mems_allowed', '', ''),
+            ('Mems_allowed_list', '', ''),
+            ('voluntary_ctxt_switches', '', ''),
+            ('nonvoluntary_ctxt_switches', '', '')
         ]
 
         return thevars
 
     @staticmethod
     def get_data():
+        """ Gets parsed /proc/[pid]/status data """
         return PidStatus.parse_pidstatus()
 
     @staticmethod
@@ -116,9 +133,13 @@ class PidStatus(BasicSPParser):
         Arguments:
             mode (str): how status should be processed
 
-                all -
-                flat -
-                relations_only -
+                all - variables and processes relations are collected
+                    in hierarchical structure
+
+                flat - same as previous, but hierarchy is not preserved
+
+                relations_only - processes hierarchy is preserved but all
+                    variables are skipped
         """
 
         if mode not in ('flat', 'relations_only', 'all'):
@@ -159,8 +180,6 @@ class PidStatus(BasicSPParser):
             traverse(c, layer)
 
         tree['pid']['0'] = layer
-
-
 
         return tree
 

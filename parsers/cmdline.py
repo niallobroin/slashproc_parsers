@@ -39,7 +39,7 @@ class CmdLine(BasicSPParser):
                           'label': "Boot Image",
                           'parents': ['cmdline'],},
 
-            'kernel_perm': {'desc': "Permissions on the kernel",
+            'ro': {'desc': "Permissions on the kernel",
                             'label': "Kernel Permissions",
                             'parents': ['cmdline'],},
 
@@ -47,11 +47,11 @@ class CmdLine(BasicSPParser):
                      'label': 'Root directory',
                      'parents': ['cmdline'],},
             
-            'some_name': {'desc': "Red Hat Graphical Boot. Graphical booting is supported",
+            'rhgb': {'desc': "Red Hat Graphical Boot. Graphical booting is supported",
                      'label': 'Graphical Boot',
                      'parents': ['cmdline'],},
             
-            'kernel_msg': {'desc': "All verbose kernel messages except extremely serious should be suppressed at boot time",
+            'quiet': {'desc': "All verbose kernel messages except extremely serious should be suppressed at boot time",
                            'label': 'Suppress boot messages',
                            'parents': ['cmdline'],},
                 
@@ -65,18 +65,20 @@ class CmdLine(BasicSPParser):
     def get_data():
         """ Parse /proc/cmdline. All variables are stored in single group.
 
-            Returns: stats (dict): dictionary with variables and their values
+            Returns: data (dict): dictionary with variables and their values
         """
         with open(CmdLine.CMDLINE) as l:
             raw = l.read()
-
         line = raw.split()
-
-        data = {"raw": raw,
-                "kernel_perm": line[0],
-                "root": line[1].strip().replace('root=', ''),
-                }
-
+		for word in line:
+			p = word.split('=')
+			b = p[0]
+			if len(p) == 2:
+				a = p[1]
+			else:
+				a = p[0]
+			data[b] = a
+		
         return {'cmdline': data}
 
 if __name__ == "__main__":

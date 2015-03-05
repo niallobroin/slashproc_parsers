@@ -50,7 +50,7 @@ class Version(BasicSPParser):
                          'parents': ['version'],},
 				'ker_type': {'desc': "Type of the kernel. SMP indicates Symmetric MultiProcessing",
                          'label': 'Kernel Type',
-                         'unit': '',
+                        'unit': '',
                          'parents': ['version'],},
 				'ker_date': {'desc': "Date and time when the kernel was built",
                          'label': 'Date of compilation',
@@ -59,22 +59,32 @@ class Version(BasicSPParser):
                 }
         return thevars
 
-    @staticmethod
+   @staticmethod
     def get_data():
         """ Parse /proc/version. All variables are stored in single group.
 
-            Returns: stats (dict): dictionary with variables and their values
+            Returns: data (dict): dictionary with variables and their values
         """
-        for l in open(Version.VERSION):
-            line = l.split('(')
-
-            version_data = {"ker_ver": line[0].strip().replace('Linux version ', ''),
-                            "user": line[1].strip().replace(')', ''),
-                            "gcc_ver": line[2].strip().replace('gcc version ', ''),
-                            "redhat_ver": line[3].split('))')[0],
-                            "ker_type": " ".join(line[3].split('))')[1].split(' ')[1:3]),
-                            "ker_date": " ".join(line[3].split('))')[1].split(' ')[3:len(line[3])])}
-        return {'version': version_data}
+        with open(Version.VERSION) as l:
+            raw = l.read()
+        
+		line = raw.split('(')
+		
+		for word in line:
+			if "Linux version" in w:
+				data['ker_ver'] = w.strip().replace('Linux version ', '')
+			if "@" in w:
+				data['user'] = w.strip().replace(')', '')
+			if "gcc" in w:
+				data['gcc_ver'] = w.strip().replace('gcc version ', '')
+			if "Red Hat" in w:
+				a = w.split(')')
+				data['redhat_ver'] = a[0].replace('Red Hat ', '')
+			if "#1" in w:
+				a = w.split("#1")
+				data['ker_date'] = a[1]
+			
+        return {'version': data}
 
 if __name__ == "__main__":
     ut = Version()

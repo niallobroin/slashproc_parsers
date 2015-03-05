@@ -1,6 +1,6 @@
-from jsonrpclib.config import Config
+from slashproc_parser.jsonrpclib.config import Config
 config = Config.instance()
-from jsonrpclib.history import History
+from slashproc_parser.jsonrpclib.history import History
 history = History.instance()
-from jsonrpclib.jsonrpc import Server, MultiCall, Fault
-from jsonrpclib.jsonrpc import ProtocolError, loads, dumps
+from slashproc_parser.jsonrpclib.jsonrpc import Server, MultiCall, Fault
+from slashproc_parser.jsonrpclib.jsonrpc import ProtocolError, loads, dumps

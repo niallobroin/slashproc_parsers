@@ -3,7 +3,7 @@ import inspect
 import re
 import traceback
 
-from jsonrpclib import config
+from slashproc_parser.jsonrpclib import config
 
 iter_types = [
     types.DictType,

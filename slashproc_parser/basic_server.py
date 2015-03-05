@@ -14,7 +14,7 @@ import sys
 import parsers
 
 from SocketServer import ThreadingMixIn
-from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
+from slashproc_parser.jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 
 SERVER_PORT = 8848
 

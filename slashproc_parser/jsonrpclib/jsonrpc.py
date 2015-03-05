@@ -57,9 +57,9 @@ import string
 import random
 
 # Library includes
-import jsonrpclib
-from jsonrpclib import config
-from jsonrpclib import history
+import slashproc_parser.jsonrpclib
+from slashproc_parser.jsonrpclib import config
+from slashproc_parser.jsonrpclib import history
 
 # JSON library importing
 cjson = None

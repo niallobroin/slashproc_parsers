@@ -4,7 +4,7 @@
 set -e
 
 
-cd ../docs
+cd docs
 
 sphinx-apidoc -o source .. -f
 

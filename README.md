@@ -1,6 +1,6 @@
 # Slashproc_parsers #
 
-Usual python setup.py install
+pip install git+git://bitbucket.org/niallobyrnes/slashproc_parsers.git
 
 ### What is this repository for? ###
 

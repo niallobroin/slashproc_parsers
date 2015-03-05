@@ -4,9 +4,9 @@ from sp_parser.basic_sp_parser import BasicSPParser
 from parse_helpers import traverse_directory
 
 
-class Kernel(BasicSPParser):
+class Net(BasicSPParser):
 
-    KERNEL = "/proc/sys/kernel"
+    NET = "/proc/sys/net"
 
     @staticmethod
     def get_vars():
@@ -14,10 +14,10 @@ class Kernel(BasicSPParser):
         """
 
         thevars = dict()
-        _, parents, all_variables = traverse_directory(Kernel.KERNEL)
+        _, parents, all_variables = traverse_directory(Net.NET)
 
         for var in all_variables:
-            thevars[Kernel.key_format(var)] = {
+            thevars[Net.key_format(var)] = {
                 'label': var,
                 'unit': '',
                 'parents': parents[var]
@@ -29,16 +29,16 @@ class Kernel(BasicSPParser):
     def get_groups():
         """
         """
-        _, parents, all_variables = traverse_directory(Kernel.KERNEL)
+        _, parents, all_variables = traverse_directory(Net.NET)
 
         # no need to take into account variables
         for var in all_variables:
             del parents[var]
 
-        groups = {'syskernel': {'label': 'Kernel system variables', 'parents': ['root']}}
+        groups = {'sysnet': {'label': 'Network system variables', 'parents': ['root']}}
 
         for i in parents.keys():
-            groups[Kernel.key_format(i)] = {
+            groups[Net.key_format(i)] = {
                 'label': i,
                 'desc': '',
                 'parents': parents[i]
@@ -48,7 +48,7 @@ class Kernel(BasicSPParser):
 
     @staticmethod
     def get_data(verbose=False):
-        """Parse /proc/sys/kernel directory and its subdirs.
+        """Parse /proc/sys/net directory and its subdirs.
 
         Each non-directory file name is treated as variable name. Accordingly,
         file's content is treated as variable value. All groups in result
@@ -58,10 +58,10 @@ class Kernel(BasicSPParser):
             tree (dict): nested dictionaries with system variables
         """
 
-        tree, _, _ = traverse_directory(Kernel.KERNEL, verbose=verbose)
+        tree, _, _ = traverse_directory(Net.NET, verbose=verbose)
         return tree
 
 
 if __name__ == "__main__":
-    k = Kernel()
-    k.test_parse()
+    n = Net()
+    n.test_parse()

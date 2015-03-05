@@ -66,30 +66,27 @@ def input_validation(path, parser, get):
     def make_list(txt):
         if not txt:
             return list()
+        if isinstance(txt, list):
+            txt = '/'.join(txt) 
         for i in SEPARATORS:
             txt = txt.replace(i, '/')
         txt = [i for i in txt.split('/') if i != '']
         return txt
 
     # if path, ignore the rest
-    if isinstance(path, list):
-        path = '/'.join(path) 
     path = make_list(path)
-
     if path:
         if path[0] == 'proc':
             path.pop(0)
         return path[0], path[1:]
 
-    if isinstance(parser, list):
-        parser = '/'.join(parser)
     parser = make_list(parser)
-    if parser:
+    if not parser:
+        return  None, None
+    else:
         if parser[0] == 'proc':
             parser.pop(0)
 
-    if isinstance(get, list):
-        get = '/'.join(get)
     get = make_list(get)
     get.extend(parser[1:])
 
@@ -118,13 +115,14 @@ def get_groups(path=None, parser=None, get=None):
 
     parser, get = input_validation(path, parser, get)
 
-    if parser not in names:
+    if not parser or parser not in names:
         return ERR.msg(1)
     groups = classes[parser].get_groups()
 
     if not get or 'all' in get or 'star' in get:
         return {'found': groups}
 
+    #TODO if desc just return desc
     ret = dict()
     for g in get:
         if g in groups:
@@ -162,7 +160,7 @@ def get_vars(path=None, parser=None, get=None):
 
     parser, get = input_validation(path, parser, get)
 
-    if parser not in names:
+    if not parser or parser not in names:
         return ERR.msg(1)
     thevars = classes[parser].get_vars()
 
@@ -207,7 +205,7 @@ def get_data(path=None, parser=None, get=None):
 
     parser, get = input_validation(path, parser, get)
 
-    if parser not in names:
+    if not parser or parser not in names:
         return ERR.msg(1)
     groups = classes[parser].get_groups()
     vars = classes[parser].get_vars()
@@ -215,16 +213,20 @@ def get_data(path=None, parser=None, get=None):
 
     data = classes[parser].get_data()
 
+    if not get:
+        return {'found': data}
+
+
     ret = dict()
     found = list()
-    def recurse_dict(dct, path, get):
+    def recurse_dict(dct, pth, get):
         for k in dct.keys():
             if k in get:
                 if k not in found:
                     found.append(k)
-                ret[path+'/'+k] = dct[k]
+                ret[pth+'/'+k] = dct[k]
             elif isinstance(dct[k], dict):
-                recurse_dict(dct[k], path+'/'+k, get)
+                recurse_dict(dct[k], pth+'/'+k, get)
 
     recurse_dict(data, '', get)
 

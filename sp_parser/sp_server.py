@@ -64,6 +64,8 @@ def input_validation(path, parser, get):
 
     # Will not fail on dot locations
     def make_list(txt):
+        if not txt:
+            return list()
         for i in SEPARATORS:
             txt = txt.replace(i, '/')
         txt = [i for i in txt.split('/') if i != '']

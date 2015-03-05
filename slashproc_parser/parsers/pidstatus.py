@@ -5,7 +5,7 @@ import os
 import glob
 from itertools import chain
 from collections import defaultdict
-from sp_parser.basic_sp_parser import BasicSPParser
+from slashproc_parser.basic_parser import BasicSPParser
 
 
 class PidStatus(BasicSPParser):

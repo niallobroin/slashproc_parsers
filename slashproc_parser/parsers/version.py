@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import re
-from sp_parser.basic_sp_parser import BasicSPParser
+from slashproc_parser.basic_parser import BasicSPParser
 
 
 class Version(BasicSPParser):

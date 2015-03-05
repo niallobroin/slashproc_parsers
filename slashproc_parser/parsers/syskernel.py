@@ -1,30 +1,30 @@
 #!/usr/bin/env python
 
-from sp_parser.basic_sp_parser import BasicSPParser
+from slashproc_parser.basic_parser import BasicSPParser
 from parse_helpers import traverse_directory
 
 
-class Net(BasicSPParser):
+class Kernel(BasicSPParser):
 
-    NET = "/proc/sys/net"
+    KERNEL = "/proc/sys/kernel"
 
     @staticmethod
     def get_groups():
-        """Enumerates groups depending on number of directories in /proc/sys/net.
+        """Enumerates groups depending on number of directories in /proc/sys/kernel.
 
         Returns:
             groups (dict): parsed variables groups
         """
-        _, parents, all_variables = traverse_directory(Net.NET)
+        _, parents, all_variables = traverse_directory(Kernel.KERNEL)
 
         # no need to take into account variables
         for var in all_variables:
             del parents[var]
 
-        groups = {'sysnet': {'label': 'Network system variables', 'parents': ['root']}}
+        groups = {'syskernel': {'label': 'Kernel system variables', 'parents': ['root']}}
 
         for i in parents.keys():
-            groups[Net.key_format(i)] = {
+            groups[Kernel.key_format(i)] = {
                 'label': i,
                 'desc': '',
                 'parents': parents[i]
@@ -34,17 +34,16 @@ class Net(BasicSPParser):
 
     @staticmethod
     def get_vars():
-        """Enumerates system variables in /proc/sys/net and its subdirectories.
+        """Enumerates system variables in /proc/sys/kernel and its subdirectories.
 
         Returns:
             thevars (dict): parsed system variables with their descriptions
         """
-
         thevars = dict()
-        _, parents, all_variables = traverse_directory(Net.NET)
+        _, parents, all_variables = traverse_directory(Kernel.KERNEL)
 
         for var in all_variables:
-            thevars[Net.key_format(var)] = {
+            thevars[Kernel.key_format(var)] = {
                 'label': var,
                 'unit': '',
                 'parents': parents[var]
@@ -52,15 +51,24 @@ class Net(BasicSPParser):
 
         # TODO: fill with variables and appropriate descriptions
         descs = [
-            ('message_burst', '', ''),
-            ('message_cost', '', ''),
-            ('netdev_max_backlog', '', ''),
-            ('optmem_max', '', ''),
-            ('rmem_default', '', ''),
-            ('rmem_max', '', ''),
-            ('wmem_default', '', ''),
-            ('wmem_max', '', ''),
-            ('icmp_echo_ignore_all', '', ''),
+            ('acct', '', ''),
+            ('ctrl_alt_del', '', ''),
+            ('domainname', '', ''),
+            ('exec_shield', '', ''),
+            ('hostname', '', ''),
+            ('hotplug', '', ''),
+            ('modprobe', '', ''),
+            ('msgmax', '', ''),
+            ('msgmnb', '', ''),
+            ('msgmni', '', ''),
+            ('osrelease', '', ''),
+            ('ostype', '', ''),
+            ('overflowgid', '', ''),
+            ('overflowuid', '', ''),
+            ('panic', '', ''),
+            ('printk', '', ''),
+            ('sem', '', ''),
+            ('shmall', '', ''),
             ('', '', ''),
             ('', '', ''),
             ('', '', ''),
@@ -70,7 +78,7 @@ class Net(BasicSPParser):
 
     @staticmethod
     def get_data(verbose=False):
-        """Parse /proc/sys/net directory and its subdirs.
+        """Parse /proc/sys/kernel directory and its subdirs.
 
         Each non-directory file name is treated as variable name. Accordingly,
         file's content is treated as variable value. All groups in result
@@ -80,10 +88,10 @@ class Net(BasicSPParser):
             tree (dict): nested dictionaries with system variables
         """
 
-        tree, _, _ = traverse_directory(Net.NET, verbose=verbose)
+        tree, _, _ = traverse_directory(Kernel.KERNEL, verbose=verbose)
         return tree
 
 
 if __name__ == "__main__":
-    n = Net()
-    n.test_parse()
+    k = Kernel()
+    k.test_parse()

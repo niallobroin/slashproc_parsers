@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from sp_parser.basic_sp_parser import BasicSPParser
+from slashproc_parser.basic_parser import BasicSPParser
 from parse_helpers import traverse_directory
 
 

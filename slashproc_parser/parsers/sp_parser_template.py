@@ -3,7 +3,7 @@
 /proc/thedir
 """
 
-from sp_parser.basic_sp_parser import BasicSPParser
+from slashproc_parser.basic_parser import BasicSPParser
 
 
 class TheParser(BasicSPParser):

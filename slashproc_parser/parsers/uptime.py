@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from sp_parser.basic_sp_parser import BasicSPParser
+from slashproc_parser.basic_parser import BasicSPParser
 
 class UpTime(BasicSPParser):
     """ Provides static methods for parsing /proc/uptime file

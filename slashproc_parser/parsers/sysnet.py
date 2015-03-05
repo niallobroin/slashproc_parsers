@@ -1,30 +1,30 @@
 #!/usr/bin/env python
 
-from sp_parser.basic_sp_parser import BasicSPParser
+from slashproc_parser.basic_parser import BasicSPParser
 from parse_helpers import traverse_directory
 
 
-class Vm(BasicSPParser):
+class Net(BasicSPParser):
 
-    VM = "/proc/sys/vm"
+    NET = "/proc/sys/net"
 
     @staticmethod
     def get_groups():
-        """Enumerates groups depending on number of directories in /proc/sys/vm.
+        """Enumerates groups depending on number of directories in /proc/sys/net.
 
         Returns:
             groups (dict): parsed variables groups
         """
-        _, parents, all_variables = traverse_directory(Vm.VM)
+        _, parents, all_variables = traverse_directory(Net.NET)
 
         # no need to take into account variables
         for var in all_variables:
             del parents[var]
 
-        groups = {'sysvm': {'label': 'Virtual memory system variables', 'parents': ['root']}}
+        groups = {'sysnet': {'label': 'Network system variables', 'parents': ['root']}}
 
         for i in parents.keys():
-            groups[Vm.key_format(i)] = {
+            groups[Net.key_format(i)] = {
                 'label': i,
                 'desc': '',
                 'parents': parents[i]
@@ -34,16 +34,17 @@ class Vm(BasicSPParser):
 
     @staticmethod
     def get_vars():
-        """Enumerates system variables in /proc/sys/vm and its subdirectories.
+        """Enumerates system variables in /proc/sys/net and its subdirectories.
 
         Returns:
-
+            thevars (dict): parsed system variables with their descriptions
         """
+
         thevars = dict()
-        _, parents, all_variables = traverse_directory(Vm.VM)
+        _, parents, all_variables = traverse_directory(Net.NET)
 
         for var in all_variables:
-            thevars[Vm.key_format(var)] = {
+            thevars[Net.key_format(var)] = {
                 'label': var,
                 'unit': '',
                 'parents': parents[var]
@@ -51,16 +52,15 @@ class Vm(BasicSPParser):
 
         # TODO: fill with variables and appropriate descriptions
         descs = [
-            ('block_dump', '', ''),
-            ('dirty_background_ratio', '', ''),
-            ('dirty_expire_centisecs', '', ''),
-            ('dirty_ratio', '', ''),
-            ('dirty_writeback_centisecs', '', ''),
-            ('laptop_mode', '', ''),
-            ('max_map_count', '', ''),
-            ('min_free_kbytes', '', ''),
-            ('nr_hugepages', '', ''),
-            ('nr_pdflush_threads', '', ''),
+            ('message_burst', '', ''),
+            ('message_cost', '', ''),
+            ('netdev_max_backlog', '', ''),
+            ('optmem_max', '', ''),
+            ('rmem_default', '', ''),
+            ('rmem_max', '', ''),
+            ('wmem_default', '', ''),
+            ('wmem_max', '', ''),
+            ('icmp_echo_ignore_all', '', ''),
             ('', '', ''),
             ('', '', ''),
             ('', '', ''),
@@ -70,7 +70,7 @@ class Vm(BasicSPParser):
 
     @staticmethod
     def get_data(verbose=False):
-        """Parse /proc/sys/vm directory and its subdirs.
+        """Parse /proc/sys/net directory and its subdirs.
 
         Each non-directory file name is treated as variable name. Accordingly,
         file's content is treated as variable value. All groups in result
@@ -79,10 +79,11 @@ class Vm(BasicSPParser):
         Returns:
             tree (dict): nested dictionaries with system variables
         """
-        tree, _, _ = traverse_directory(Vm.VM, verbose=verbose)
+
+        tree, _, _ = traverse_directory(Net.NET, verbose=verbose)
         return tree
 
 
 if __name__ == "__main__":
-    vm = Vm()
-    vm.test_parse()
+    n = Net()
+    n.test_parse()

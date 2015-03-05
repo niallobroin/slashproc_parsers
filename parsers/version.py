@@ -33,7 +33,7 @@ class Version(BasicSPParser):
             Returns: thevars (dict): variables
         """
         thevars = {
-            'ker_ver': {
+            'kernel_version': {
                 'desc': "Exact version of the Linux kernel used in the OS",
                 'label': 'Kernel Version',
                 'unit': '',
@@ -45,25 +45,25 @@ class Version(BasicSPParser):
                 'unit': '',
                 'parents': ['version']
             },
-            'gcc_ver': {
+            'gcc_version': {
                 'desc': "Version of the GCC compiler used for building the kernel",
                 'label': 'GCC Version',
                 'unit': '',
                 'parents': ['version']
             },
-            'os_ver': {
+            'os_version': {
                 'desc': "OS version",
                 'label': 'OS Version',
                 'unit': '',
                 'parents': ['version']
             },
-            'ker_type': {
+            'kernel_type': {
                 'desc': "Type of the kernel. SMP indicates Symmetric MultiProcessing",
                 'label': 'Kernel Type',
                 'unit': '',
                 'parents': ['version']
             },
-            'ker_date': {
+            'kernel_date': {
                 'desc': "Date and time when the kernel was built",
                 'label': 'Date of compilation',
                 'unit': '',
@@ -82,28 +82,29 @@ class Version(BasicSPParser):
         retdict = dict()
 
         kernel_regex = [
-            ('ker_ver', '[-.\d]+\w+'),
-            ('user', '\(\w+@\w+\)'),
-            ('gcc_ver', '\(gcc version [.\d]+\s+.*\)'),
+            ('kernel_version', '[-.\d]+\w+'),
+            ('user', '\(\w+@\S+\)'),
+            ('gcc_version', '\(gcc version [.\d]+\s+.*\)'),
         ]
 
         with open(Version.VERSION) as l:
             line = l.readline().strip('\n')
 
-            kernel_ver, os_ver = line.split('#')
+            ker_ver, os_ver = line.split('#')
 
             for var, pattern in kernel_regex:
-                m = re.search(pattern, kernel_ver)
-                retdict[var] = kernel_ver[m.start(): m.end()]
+                m = re.search(pattern, ker_ver)
+                if m:
+                    retdict[var] = ker_ver[m.start(): m.end()]
 
             m = re.search('(Mon|Tue|Wed|Thu|Fri|Sat|Sun)', os_ver)
 
             ker_date = os_ver[m.start():]
             os_ver, ker_type = os_ver.replace(ker_date, '').strip().split()
 
-            retdict['ker_date'] = ker_date
-            retdict['os_ver'] = os_ver
-            retdict['ker_type'] = ker_type
+            retdict['kernel_date'] = ker_date
+            retdict['os_version'] = os_ver
+            retdict['kernel_type'] = ker_type
 
         # leave only innermost braces
         return {k: v.strip('()').strip(' ')

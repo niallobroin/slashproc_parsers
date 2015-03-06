@@ -36,28 +36,28 @@ class CmdLine(BasicSPParser):
                     'parents': ['cmdline'],},
 
             'boot_image':{'desc': '',
-                          'label': "Boot Image",
-                          'parents': ['cmdline'],},
+                        'label': "Boot Image",
+                        'parents': ['cmdline'],},
 
             'ro': {'desc': "Permissions on the kernel",
                             'label': "Kernel Permissions",
                             'parents': ['cmdline'],},
 
             'root': {'desc': "Location of the root filesystem image",
-                     'label': 'Root directory',
-                     'parents': ['cmdline'],},
+                    'label': 'Root directory',
+                    'parents': ['cmdline'],},
             
             'rhgb': {'desc': "Red Hat Graphical Boot. Graphical booting is supported",
-                     'label': 'Graphical Boot',
-                     'parents': ['cmdline'],},
+                    'label': 'Graphical Boot',
+                    'parents': ['cmdline'],},
             
             'quiet': {'desc': "All verbose kernel messages except extremely serious should be suppressed at boot time",
-                           'label': 'Suppress boot messages',
-                           'parents': ['cmdline'],},
+                    'label': 'Suppress boot messages',
+                    'parents': ['cmdline'],},
                 
             'lang': {'desc': "Language",
-                     'label': 'Language',
-                     'parents': ['cmdline'],},
+                    'label': 'Language',
+                    'parents': ['cmdline'],},
                 }
         return thevars
 
@@ -69,15 +69,15 @@ class CmdLine(BasicSPParser):
         """
         with open(CmdLine.CMDLINE) as l:
             raw = l.read()
-        line = raw.split()
-		for word in line:
-			p = word.split('=')
-			b = p[0]
-			if len(p) == 2:
-				a = p[1]
-			else:
-				a = p[0]
-			data[b] = a
+            line = raw.split()
+            for word in line:
+                p = word.split('=')
+                b = p[0]
+                if len(p) == 2:
+                    a = p[1]
+                else:
+                    a = p[0]
+            data[b] = a
 		
         return {'cmdline': data}
 

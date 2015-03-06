@@ -9,25 +9,11 @@ class Kernel(BasicSPParser):
     KERNEL = "/proc/sys/kernel"
 
     @staticmethod
-    def get_vars():
-        """
-        """
-
-        thevars = dict()
-        _, parents, all_variables = traverse_directory(Kernel.KERNEL)
-
-        for var in all_variables:
-            thevars[Kernel.key_format(var)] = {
-                'label': var,
-                'unit': '',
-                'parents': parents[var]
-            }
-
-        return thevars
-
-    @staticmethod
     def get_groups():
-        """
+        """Enumerates groups depending on number of directories in /proc/sys/kernel.
+
+        Returns:
+            groups (dict): parsed variables groups
         """
         _, parents, all_variables = traverse_directory(Kernel.KERNEL)
 
@@ -45,6 +31,50 @@ class Kernel(BasicSPParser):
             }
 
         return groups
+
+    @staticmethod
+    def get_vars():
+        """Enumerates system variables in /proc/sys/kernel and its subdirectories.
+
+        Returns:
+            thevars (dict): parsed system variables with their descriptions
+        """
+        thevars = dict()
+        _, parents, all_variables = traverse_directory(Kernel.KERNEL)
+
+        for var in all_variables:
+            thevars[Kernel.key_format(var)] = {
+                'label': var,
+                'unit': '',
+                'parents': parents[var]
+            }
+
+        # TODO: fill with variables and appropriate descriptions
+        descs = [
+            ('acct', '', ''),
+            ('ctrl_alt_del', '', ''),
+            ('domainname', '', ''),
+            ('exec_shield', '', ''),
+            ('hostname', '', ''),
+            ('hotplug', '', ''),
+            ('modprobe', '', ''),
+            ('msgmax', '', ''),
+            ('msgmnb', '', ''),
+            ('msgmni', '', ''),
+            ('osrelease', '', ''),
+            ('ostype', '', ''),
+            ('overflowgid', '', ''),
+            ('overflowuid', '', ''),
+            ('panic', '', ''),
+            ('printk', '', ''),
+            ('sem', '', ''),
+            ('shmall', '', ''),
+            ('', '', ''),
+            ('', '', ''),
+            ('', '', ''),
+        ]
+
+        return thevars
 
     @staticmethod
     def get_data(verbose=False):

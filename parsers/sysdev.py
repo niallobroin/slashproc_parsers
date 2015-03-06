@@ -6,13 +6,13 @@ from parse_helpers import traverse_directory
 
 class Dev(BasicSPParser):
 
-    DEBUG = "/proc/sys/debug"
+    DEV = "/proc/sys/dev"
 
     @staticmethod
     def get_groups():
         """
         """
-        _, parents, all_variables = traverse_directory(Debug.DEBUG)
+        _, parents, all_variables = traverse_directory(Dev.DEV)
 
         # no need to take into account variables
         for var in all_variables:
@@ -21,7 +21,7 @@ class Dev(BasicSPParser):
         groups = {'sysvm': {'label': 'Debug system variables', 'parents': ['root']}}
 
         for i in parents.keys():
-            groups[Debug.key_format(i)] = {
+            groups[Dev.key_format(i)] = {
                 'label': i,
                 'desc': '',
                 'parents': parents[i]
@@ -34,10 +34,10 @@ class Dev(BasicSPParser):
         """
         """
         thevars = dict()
-        _, parents, all_variables = traverse_directory(Debug.DEBUG)
+        _, parents, all_variables = traverse_directory(Dev.DEV)
 
         for var in all_variables:
-            thevars[Debug.key_format(Debug)] = {
+            thevars[Dev.key_format(var)] = {
                 'label': var,
                 'unit': '',
                 'parents': parents[var]
@@ -45,7 +45,14 @@ class Dev(BasicSPParser):
 
         # TODO: fill with variables and appropriate descriptions
         descs = [
-
+            ('', '', ''),
+            ('', '', ''),
+            ('', '', ''),
+            ('', '', ''),
+            ('', '', ''),
+            ('', '', ''),
+            ('', '', ''),
+            ('', '', '')
         ]
 
         return thevars
@@ -54,5 +61,10 @@ class Dev(BasicSPParser):
     def get_data(verbose=False):
         """
         """
-        tree, _, _ = traverse_directory(Debug.DEBUG, verbose=verbose)
+        tree, _, _ = traverse_directory(Dev.DEV, verbose=verbose)
         return tree
+
+
+if __name__ == "__main__":
+    d = Dev()
+    d.test_parse()

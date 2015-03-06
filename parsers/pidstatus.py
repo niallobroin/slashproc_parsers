@@ -38,7 +38,7 @@ class PidStatus(BasicSPParser):
 
     @staticmethod
     def get_vars():
-        """ Create variables from all collected processes.
+        """Creates variables from all collected processes.
 
         Each process status can has variables that were not already met
         so need iterate over all processes to collect all available keys.

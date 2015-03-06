@@ -9,25 +9,11 @@ class Net(BasicSPParser):
     NET = "/proc/sys/net"
 
     @staticmethod
-    def get_vars():
-        """
-        """
-
-        thevars = dict()
-        _, parents, all_variables = traverse_directory(Net.NET)
-
-        for var in all_variables:
-            thevars[Net.key_format(var)] = {
-                'label': var,
-                'unit': '',
-                'parents': parents[var]
-            }
-
-        return thevars
-
-    @staticmethod
     def get_groups():
-        """
+        """Enumerates groups depending on number of directories in /proc/sys/net.
+
+        Returns:
+            groups (dict): parsed variables groups
         """
         _, parents, all_variables = traverse_directory(Net.NET)
 
@@ -45,6 +31,42 @@ class Net(BasicSPParser):
             }
 
         return groups
+
+    @staticmethod
+    def get_vars():
+        """Enumerates system variables in /proc/sys/net and its subdirectories.
+
+        Returns:
+            thevars (dict): parsed system variables with their descriptions
+        """
+
+        thevars = dict()
+        _, parents, all_variables = traverse_directory(Net.NET)
+
+        for var in all_variables:
+            thevars[Net.key_format(var)] = {
+                'label': var,
+                'unit': '',
+                'parents': parents[var]
+            }
+
+        # TODO: fill with variables and appropriate descriptions
+        descs = [
+            ('message_burst', '', ''),
+            ('message_cost', '', ''),
+            ('netdev_max_backlog', '', ''),
+            ('optmem_max', '', ''),
+            ('rmem_default', '', ''),
+            ('rmem_max', '', ''),
+            ('wmem_default', '', ''),
+            ('wmem_max', '', ''),
+            ('icmp_echo_ignore_all', '', ''),
+            ('', '', ''),
+            ('', '', ''),
+            ('', '', ''),
+        ]
+
+        return thevars
 
     @staticmethod
     def get_data(verbose=False):

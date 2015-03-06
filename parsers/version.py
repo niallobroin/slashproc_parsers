@@ -32,34 +32,33 @@ class Version(BasicSPParser):
         """
         thevars = {
                 'ker_ver': {'desc': "Exact version of the Linux kernel used in the OS",
-                          'label': 'Kernel Version',
-                          'unit': '',
-                          'parents': ['version'],},
-
+                            'label': 'Kernel Version',
+                            'unit': '',
+                            'parents': ['version'],},
                 'user': {'desc': "User who compiled the kernel, host name where it happened",
-                         'label': 'Username, hostname',
-                         'unit': '',
-                         'parents': ['version'],},
-				'gcc_ver': {'desc': "Version of the GCC compiler used for building the kernel",
-                         'label': 'GCC Version',
-                         'unit': '',
-                         'parents': ['version'],},
-				'redhat_ver': {'desc': "RedHat version",
-                         'label': 'RedHat Version',
-                         'unit': '',
-                         'parents': ['version'],},
-				'ker_type': {'desc': "Type of the kernel. SMP indicates Symmetric MultiProcessing",
-                         'label': 'Kernel Type',
+                        'label': 'Username, hostname',
                         'unit': '',
-                         'parents': ['version'],},
-				'ker_date': {'desc': "Date and time when the kernel was built",
-                         'label': 'Date of compilation',
-                         'unit': '',
-                         'parents': ['version'],},
+                        'parents': ['version'],},
+                'gcc_ver': {'desc': "Version of the GCC compiler used for building the kernel",
+                        'label': 'GCC Version',
+                        'unit': '',
+                        'parents': ['version'],},
+                'redhat_ver': {'desc': "RedHat version",
+                        'label': 'RedHat Version',
+                        'unit': '',
+                        'parents': ['version'],},
+                'ker_type': {'desc': "Type of the kernel. SMP indicates Symmetric MultiProcessing",
+                        'label': 'Kernel Type',
+                        'unit': '',
+                        'parents': ['version'],},
+                'ker_date': {'desc': "Date and time when the kernel was built",
+                        'label': 'Date of compilation',
+                        'unit': '',
+                        'parents': ['version'],},
                 }
         return thevars
 
-   @staticmethod
+    @staticmethod
     def get_data():
         """ Parse /proc/version. All variables are stored in single group.
 
@@ -68,21 +67,21 @@ class Version(BasicSPParser):
         with open(Version.VERSION) as l:
             raw = l.read()
         
-		line = raw.split('(')
+            line = raw.split('(')
 		
-		for word in line:
-			if "Linux version" in w:
-				data['ker_ver'] = w.strip().replace('Linux version ', '')
-			if "@" in w:
-				data['user'] = w.strip().replace(')', '')
-			if "gcc" in w:
-				data['gcc_ver'] = w.strip().replace('gcc version ', '')
-			if "Red Hat" in w:
-				a = w.split(')')
-				data['redhat_ver'] = a[0].replace('Red Hat ', '')
-			if "#1" in w:
-				a = w.split("#1")
-				data['ker_date'] = a[1]
+            for word in line:
+                if "Linux version" in w:
+                    data['ker_ver'] = w.strip().replace('Linux version ', '')
+                if "@" in w:
+                    data['user'] = w.strip().replace(')', '')
+                if "gcc" in w:
+                    data['gcc_ver'] = w.strip().replace('gcc version ', '')
+                if "Red Hat" in w:
+                    a = w.split(')')
+                    data['redhat_ver'] = a[0].replace('Red Hat ', '')
+                if "#1" in w:
+                    a = w.split("#1")
+                    data['ker_date'] = a[1]
 			
         return {'version': data}
 

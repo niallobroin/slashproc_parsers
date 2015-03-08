@@ -116,7 +116,5 @@ class CmdLine(BasicSPParser):
         return retdict
 
 if __name__ == "__main__":
-    import pprint
     cl = CmdLine()
-    # pprint.pprint(cl.get_data())
     cl.test_parse()

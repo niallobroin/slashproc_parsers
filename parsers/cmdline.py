@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+import re
 from sp_parser.basic_sp_parser import BasicSPParser
+
 
 class CmdLine(BasicSPParser):
     """ Provides static methods for parsing /proc/cmdline file
@@ -28,37 +30,65 @@ class CmdLine(BasicSPParser):
             Each variable is represented by dictionary that contains variable name,
             list of groups that contain this variable and unit of measurement.
 
-            Returns: thevars (dict): variables
+            Returns:
+                thevars (dict): variables
         """
-        thevars = {
-            'raw': {'desc': "The full kernel boot command",
-                    'label': "Command Kernel Line",
-                    'parents': ['cmdline'],},
 
-            'boot_image':{'desc': '',
-                        'label': "Boot Image",
-                        'parents': ['cmdline'],},
+        descs = {
+            'raw': {
+                'desc': "The full kernel boot command",
+                'label': "Command Kernel Line",
+                'parents': ['cmdline']
+            },
 
-            'ro': {'desc': "Permissions on the kernel",
-                            'label': "Kernel Permissions",
-                            'parents': ['cmdline'],},
+            'boot_image': {
+                'desc': '',
+                'label': "Boot Image",
+                'parents': ['cmdline']
+            },
 
-            'root': {'desc': "Location of the root filesystem image",
-                    'label': 'Root directory',
-                    'parents': ['cmdline'],},
-            
-            'rhgb': {'desc': "Red Hat Graphical Boot. Graphical booting is supported",
-                    'label': 'Graphical Boot',
-                    'parents': ['cmdline'],},
-            
-            'quiet': {'desc': "All verbose kernel messages except extremely serious should be suppressed at boot time",
-                    'label': 'Suppress boot messages',
-                    'parents': ['cmdline'],},
-                
-            'lang': {'desc': "Language",
-                    'label': 'Language',
-                    'parents': ['cmdline'],},
-                }
+            'ro': {
+                'desc': "Mount root device read-only on boot",
+                'label': "Kernel Permissions",
+                'parents': ['cmdline']
+            },
+
+            'root': {
+                'desc': "Location of the root filesystem image",
+                'label': 'Root directory',
+                'parents': ['cmdline']
+            },
+
+            'rhgb': {
+                'desc': "Red Hat Graphical Boot. Graphical booting is supported",
+                'label': 'Graphical Boot',
+                'parents': ['cmdline']
+            },
+
+            'quiet': {
+                'desc': "All verbose kernel messages except extremely serious should be suppressed at boot time",
+                'label': 'Suppress boot messages',
+                'parents': ['cmdline']
+            },
+
+            'lang': {
+                'desc': "Language",
+                'label': 'Language',
+                'parents': ['cmdline']
+            },
+        }
+
+        thevars = dict()
+        data = CmdLine.get_data()
+
+        # remove not appeared in cmd arguments
+        for var in descs.keys():
+            if var in data.keys():
+                thevars[var] = dict()
+                thevars[var]['desc'] = descs[var]['desc']
+                thevars[var]['label'] = descs[var]['label']
+                thevars[var]['parents'] = ['cmdline']
+
         return thevars
 
     @staticmethod
@@ -67,20 +97,26 @@ class CmdLine(BasicSPParser):
 
             Returns: data (dict): dictionary with variables and their values
         """
-        with open(CmdLine.CMDLINE) as l:
-            raw = l.read()
-            line = raw.split()
-            for word in line:
-                p = word.split('=')
-                b = p[0]
-                if len(p) == 2:
-                    a = p[1]
+        retdict = dict()
+
+        with open(CmdLine.CMDLINE) as f:
+            line = f.readline().strip('\n')
+            retdict['raw'] = line
+
+            for arg in line.split():
+
+                if re.match('[\w_.]+=', arg):
+                    pos = arg.find('=')
+                    k, v = arg[:pos], arg[pos+1:]
+                    retdict[CmdLine.key_format(k)] = v
+
                 else:
-                    a = p[0]
-            data[b] = a
-		
-        return {'cmdline': data}
+                    retdict[CmdLine.key_format(arg)] = arg
+
+        return retdict
 
 if __name__ == "__main__":
+    import pprint
     cl = CmdLine()
+    # pprint.pprint(cl.get_data())
     cl.test_parse()

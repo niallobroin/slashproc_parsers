@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+import re
 from sp_parser.basic_sp_parser import BasicSPParser
+
 
 class Version(BasicSPParser):
     """ Provides static methods for parsing /proc/version file
@@ -31,59 +33,82 @@ class Version(BasicSPParser):
             Returns: thevars (dict): variables
         """
         thevars = {
-                'ker_ver': {'desc': "Exact version of the Linux kernel used in the OS",
-                            'label': 'Kernel Version',
-                            'unit': '',
-                            'parents': ['version'],},
-                'user': {'desc': "User who compiled the kernel, host name where it happened",
-                        'label': 'Username, hostname',
-                        'unit': '',
-                        'parents': ['version'],},
-                'gcc_ver': {'desc': "Version of the GCC compiler used for building the kernel",
-                        'label': 'GCC Version',
-                        'unit': '',
-                        'parents': ['version'],},
-                'redhat_ver': {'desc': "RedHat version",
-                        'label': 'RedHat Version',
-                        'unit': '',
-                        'parents': ['version'],},
-                'ker_type': {'desc': "Type of the kernel. SMP indicates Symmetric MultiProcessing",
-                        'label': 'Kernel Type',
-                        'unit': '',
-                        'parents': ['version'],},
-                'ker_date': {'desc': "Date and time when the kernel was built",
-                        'label': 'Date of compilation',
-                        'unit': '',
-                        'parents': ['version'],},
-                }
+            'ker_ver': {
+                'desc': "Exact version of the Linux kernel used in the OS",
+                'label': 'Kernel Version',
+                'unit': '',
+                'parents': ['version']
+            },
+            'user': {
+                'desc': "User who compiled the kernel, host name where it happened",
+                'label': 'Username, hostname',
+                'unit': '',
+                'parents': ['version']
+            },
+            'gcc_ver': {
+                'desc': "Version of the GCC compiler used for building the kernel",
+                'label': 'GCC Version',
+                'unit': '',
+                'parents': ['version']
+            },
+            'os_ver': {
+                'desc': "OS version",
+                'label': 'OS Version',
+                'unit': '',
+                'parents': ['version']
+            },
+            'ker_type': {
+                'desc': "Type of the kernel. SMP indicates Symmetric MultiProcessing",
+                'label': 'Kernel Type',
+                'unit': '',
+                'parents': ['version']
+            },
+            'ker_date': {
+                'desc': "Date and time when the kernel was built",
+                'label': 'Date of compilation',
+                'unit': '',
+                'parents': ['version']
+            }
+        }
         return thevars
 
     @staticmethod
     def get_data():
         """ Parse /proc/version. All variables are stored in single group.
 
-            Returns: data (dict): dictionary with variables and their values
+            Returns:
+                data (dict): dictionary with variables and their values
         """
+        retdict = dict()
+
+        kernel_regex = [
+            ('ker_ver', '[-.\d]+\w+'),
+            ('user', '\(\w+@\w+\)'),
+            ('gcc_ver', '\(gcc version [.\d]+\s+.*\)'),
+        ]
+
         with open(Version.VERSION) as l:
-            raw = l.read()
-        
-            line = raw.split('(')
-		
-            for word in line:
-                if "Linux version" in w:
-                    data['ker_ver'] = w.strip().replace('Linux version ', '')
-                if "@" in w:
-                    data['user'] = w.strip().replace(')', '')
-                if "gcc" in w:
-                    data['gcc_ver'] = w.strip().replace('gcc version ', '')
-                if "Red Hat" in w:
-                    a = w.split(')')
-                    data['redhat_ver'] = a[0].replace('Red Hat ', '')
-                if "#1" in w:
-                    a = w.split("#1")
-                    data['ker_date'] = a[1]
-			
-        return {'version': data}
+            line = l.readline().strip('\n')
+
+            kernel_ver, os_ver = line.split('#')
+
+            for var, pattern in kernel_regex:
+                m = re.search(pattern, kernel_ver)
+                retdict[var] = kernel_ver[m.start(): m.end()]
+
+            m = re.search('(Mon|Tue|Wed|Thu|Fri|Sat|Sun)', os_ver)
+
+            ker_date = os_ver[m.start():]
+            os_ver, ker_type = os_ver.replace(ker_date, '').strip().split()
+
+            retdict['ker_date'] = ker_date
+            retdict['os_ver'] = os_ver
+            retdict['ker_type'] = ker_type
+
+        # leave only innermost braces
+        return {k: v.strip('()').strip(' ')
+                for k, v in retdict.iteritems()}
+
 
 if __name__ == "__main__":
     ut = Version()

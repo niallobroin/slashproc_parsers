@@ -20,8 +20,11 @@ class VmStat(BasicSPParser):
     def get_groups():
         """Used for getting groups into which file is divided
 
+        /proc/vmstate contains list of variables that are not separated into
+        groups so only one group is created.
+
         Returns:
-            dict: groups
+            groups (dict): variables groups
         """
         return {'vmstat': {'label': 'vmstat', 'parents': ['root']}}
 
@@ -33,7 +36,7 @@ class VmStat(BasicSPParser):
         list of groups that contain this variable and unit of measurement.
 
         Returns:
-            thevars (dict): variables
+            thevars (dict): variables descriptions
 
         """
         retdict = VmStat.get_data()

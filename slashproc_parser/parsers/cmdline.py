@@ -258,16 +258,11 @@ class CmdLine(BasicSPParser):
             },
         }
 
-        thevars = dict()
-        data = CmdLine.get_data()
-
         # remove not appeared in cmd arguments
-        for var in descs.keys():
-            if var in data.keys():
-                thevars[var] = dict()
-                thevars[var]['desc'] = descs[var]['desc']
-                thevars[var]['label'] = descs[var]['label']
-                thevars[var]['parents'] = ['cmdline']
+        thevars = dict()
+        for var in CmdLine.get_data():
+            if var in descs:
+                thevars[var] = descs[var]
 
         return thevars
 

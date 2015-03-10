@@ -59,7 +59,7 @@ class PidStatusRaw(BasicSPParser):
 
     @staticmethod
     def get_vars():
-        """ Create variables from all collected processes.
+        """Create variables from all collected processes.
 
         Each process status can has variables that were not already met
         so need iterate over all processes to collect all available keys.
@@ -125,7 +125,7 @@ class PidStatusRaw(BasicSPParser):
 
     @staticmethod
     def get_data():
-        """ Collects data from PID directories """
+        """ Collect data from PID directories """
         return PidStatusRaw.parse_pidstatus()
 
     @staticmethod

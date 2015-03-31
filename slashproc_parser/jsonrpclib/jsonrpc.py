@@ -11,9 +11,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and 
 limitations under the License. 
 
-============================
 JSONRPC Library (jsonrpclib)
-============================
 
 This library is a JSON-RPC v.2 (proposed) implementation which
 follows the xmlrpclib API for portability between clients. It

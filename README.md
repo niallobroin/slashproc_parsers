@@ -1,6 +1,6 @@
 # Slashproc_parsers #
 
-pip install git+git://bitbucket.org/niallobyrnes/slashproc_parsers.git
+pip install git+git://github.com/niallobyrnes/slashproc_parsers.git
 
 ### What is this repository for? ###
 

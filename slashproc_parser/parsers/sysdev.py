@@ -4,7 +4,7 @@ from slashproc_parser.basic_parser import BasicSPParser
 from parse_helpers import traverse_directory
 
 
-class Dev(BasicSPParser):
+class SysDev(BasicSPParser):
 
     DEV = "/proc/sys/dev"
 
@@ -12,7 +12,7 @@ class Dev(BasicSPParser):
     def get_groups():
         """
         """
-        _, parents, all_variables = traverse_directory(Dev.DEV)
+        _, parents, all_variables = traverse_directory(SysDev.DEV)
 
         # no need to take into account variables
         for var in all_variables:
@@ -21,7 +21,7 @@ class Dev(BasicSPParser):
         groups = {'sysvm': {'label': 'Debug system variables', 'parents': ['root']}}
 
         for i in parents.keys():
-            groups[Dev.key_format(i)] = {
+            groups[SysDev.key_format(i)] = {
                 'label': i,
                 'desc': '',
                 'parents': parents[i]
@@ -34,10 +34,10 @@ class Dev(BasicSPParser):
         """
         """
         thevars = dict()
-        _, parents, all_variables = traverse_directory(Dev.DEV)
+        _, parents, all_variables = traverse_directory(SysDev.DEV)
 
         for var in all_variables:
-            thevars[Dev.key_format(var)] = {
+            thevars[SysDev.key_format(var)] = {
                 'label': var,
                 'unit': '',
                 'parents': parents[var]
@@ -83,7 +83,7 @@ class Dev(BasicSPParser):
 
             'lock': {
                 'desc': "If enabled (1), lock the door on device open. It is the default",
-                'label': "Lock the Door on Device Open",
+                'label': "Lock the Door on SysDevice Open",
                 'parents': ['dev']
             },
 
@@ -154,7 +154,7 @@ class Dev(BasicSPParser):
             },
 
             'active': {
-                'desc': "A list of the device drivers using that port. A '+' will appear by the name of the device currently using the port (it might not appear against any). The string "none" means that there are no device drivers using that port",
+                'desc': "A list of the device drivers using that port. A '+' will appear by the name of the device currently using the port (it might not appear against any). The string 'none' means that there are no device drivers using that port",
                 'label': "Active",
                 'parents': ['dev']
             },
@@ -220,10 +220,10 @@ class Dev(BasicSPParser):
     def get_data(verbose=False):
         """
         """
-        tree, _, _ = traverse_directory(Dev.DEV, verbose=verbose)
+        tree, _, _ = traverse_directory(SysDev.DEV, verbose=verbose)
         return tree
 
 
 if __name__ == "__main__":
-    d = Dev()
+    d = SysDev()
     d.test_parse()

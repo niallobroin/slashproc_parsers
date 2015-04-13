@@ -119,7 +119,7 @@ class PidStatus(BasicSPParser):
 
             'FDSize': {
                 'desc': 'Number of file descriptor slots currently allocated',
-                'label': "File Descriptor Size,
+                'label': "File Descriptor Size",
                 'parents': ['pidstatus']
             },
 

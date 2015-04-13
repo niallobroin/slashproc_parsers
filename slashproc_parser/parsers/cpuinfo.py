@@ -37,7 +37,7 @@ class CpuInfo(BasicSPParser):
         parents = data['cpuinfo'].keys()
        
        
-        descs = {
+        thevars = {
             'processor': {
                 'desc': "Provides each processor with an identifying number. On systems that have one processor, only a 0 is present",
                 'label': 'Processor ID',

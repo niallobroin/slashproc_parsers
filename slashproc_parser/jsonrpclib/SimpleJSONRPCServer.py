@@ -1,4 +1,4 @@
-import slashproc_parser.jsonrpclib
+import slashproc_parser.jsonrpclib as jsonrpclib
 from slashproc_parser.jsonrpclib import Fault
 from slashproc_parser.jsonrpclib.jsonrpc import USE_UNIX_SOCKETS
 import SimpleXMLRPCServer

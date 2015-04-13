@@ -4,7 +4,7 @@ from slashproc_parser.basic_parser import BasicSPParser
 from parse_helpers import traverse_directory
 
 
-class Vm(BasicSPParser):
+class SysVm(BasicSPParser):
 
     VM = "/proc/sys/vm"
 
@@ -15,7 +15,7 @@ class Vm(BasicSPParser):
         Returns:
             groups (dict): parsed variables groups
         """
-        _, parents, all_variables = traverse_directory(Vm.VM)
+        _, parents, all_variables = traverse_directory(SysVm.VM)
 
         # no need to take into account variables
         for var in all_variables:
@@ -24,7 +24,7 @@ class Vm(BasicSPParser):
         groups = {'sysvm': {'label': 'Virtual memory system variables', 'parents': ['root']}}
 
         for i in parents.keys():
-            groups[Vm.key_format(i)] = {
+            groups[SysVm.key_format(i)] = {
                 'label': i,
                 'desc': '',
                 'parents': parents[i]
@@ -40,10 +40,10 @@ class Vm(BasicSPParser):
 
         """
         thevars = dict()
-        _, parents, all_variables = traverse_directory(Vm.VM)
+        _, parents, all_variables = traverse_directory(SysVm.VM)
 
         for var in all_variables:
-            thevars[Vm.key_format(var)] = {
+            thevars[SysVm.key_format(var)] = {
                 'label': var,
                 'unit': '',
                 'parents': parents[var]
@@ -94,7 +94,7 @@ class Vm(BasicSPParser):
             },
             
             'dirty_writeback_centisecs': {
-                'desc': "The pdflush writeback daemons will periodically wake up and write "old" data out to disk. This tunable expresses the interval between those wakeups, in 100'ths of a second",
+                'desc': "The pdflush writeback daemons will periodically wake up and write 'old' data out to disk. This tunable expresses the interval between those wakeups, in 100'ths of a second",
                 'label': "Dirty Writeback Centisecs",
                 'parents': ['vm']
             },
@@ -300,10 +300,10 @@ class Vm(BasicSPParser):
         Returns:
             tree (dict): nested dictionaries with system variables
         """
-        tree, _, _ = traverse_directory(Vm.VM, verbose=verbose)
+        tree, _, _ = traverse_directory(SysVm.VM, verbose=verbose)
         return tree
 
 
 if __name__ == "__main__":
-    vm = Vm()
+    vm = SysVm()
     vm.test_parse()

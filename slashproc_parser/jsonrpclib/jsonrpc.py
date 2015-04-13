@@ -484,7 +484,7 @@ def dumps(params=[], methodname=None, methodresponse=None,
         raise ValueError('Method name must be a string, or methodresponse '+
                          'must be set to True.')
     if config.use_jsonclass == True:
-        from jsonrpclib import jsonclass
+        from slashproc_parser.jsonrpclib import jsonclass
         params = jsonclass.dump(params)
     if methodresponse is True:
         if rpcid is None:
@@ -512,7 +512,7 @@ def loads(data):
     # should return something like the following:
     # { 'jsonrpc':'2.0', 'error': fault.error(), id: None }
     if config.use_jsonclass == True:
-        from jsonrpclib import jsonclass
+        from slashproc_parser.jsonrpclib import jsonclass
         result = jsonclass.load(result)
     return result
 

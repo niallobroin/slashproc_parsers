@@ -1,10 +1,10 @@
 """
 Multithreaded JSONRPCServer example
 
-addr = "localhost:8848"
+addr = "http://localhost:8848"
 requests.post(addr, data='{"method": "get_data", "params":{"parser": "cpuinfo", "get": "model_name"}, "id":456}').json()
 
-curl -X POST http://localhost:8848 -d '{"method": "get_data", "id":"2", "params":{"dir":"/proc/uptime"}}'
+curl -X POST http://localhost:8848 -d '{"method": "get_data", "id":"2", "params":{"path":"/proc/uptime"}}'
 
 reply
 {"jsonrpc": "2.0", "result": {"uptime": {"found": {"uptime": 55}}}, "id": "2"}
@@ -48,8 +48,10 @@ def import_parsers():
 
     for modpy in parsers.__all__:
         mod = __import__('parsers.' + modpy, fromlist=[modpy])
+
         classes = [getattr(mod, modpy) for modpy in dir(mod)
-            if isinstance(getattr(mod, modpy), type) and modpy != 'sp_parser_template.py']
+            if isinstance(getattr(mod, modpy), type) and modpy not in 
+                    ['BasicSPParser']]
 
         for cls in classes:
             parsers_name.append(cls.__name__.lower())
@@ -92,6 +94,10 @@ def input_validation(path, parser, get):
 
     return parser[0], get
 
+def get_parsers():
+    names, classes = import_parsers()
+    return names
+
 def get_groups(path=None, parser=None, get=None):
     """
     Method to return one or more group descriptors
@@ -100,7 +106,7 @@ def get_groups(path=None, parser=None, get=None):
      "params": {
         "path": "/core1",
         #or
-        "parser": "/proc/cpuinfo|cpuinfo",
+        "parser": "[/proc/cpuinfo|cpuinfo]",
         "get": "core1"
     }}
 
@@ -242,11 +248,11 @@ def get_data(path=None, parser=None, get=None):
     return retdict
 
 def main():
-    a, b = import_parsers()
     server = SimpleThreadedJSONRPCServer(('localhost', SERVER_PORT))
-    server.register_function(get_data)
+    server.register_function(get_parsers)
     server.register_function(get_groups)
     server.register_function(get_vars)
+    server.register_function(get_data)
     server.serve_forever()
 
 if __name__ == '__main__':

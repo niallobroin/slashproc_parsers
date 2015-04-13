@@ -642,7 +642,7 @@ class CmdLine(BasicSPParser):
             },
                         
             'netdev': {
-                'desc': 'Specifies network device parameters, which are specific to the driver used by the network device. Some drivers' source files document the applicable options',
+                'desc': 'Specifies network device parameters, which are specific to the driver used by the network device. Some drivers source files document the applicable options',
                 'label': "Network Device Parameters",
                 'parents': ['cmdline']
             },
@@ -660,7 +660,7 @@ class CmdLine(BasicSPParser):
             },
                         
             'thash_entries': {
-                'desc': 'Overrides the default number of hash buckets for the kernel's TCP connection cache',
+                'desc': 'Overrides the default number of hash buckets for the kernels TCP connection cache',
                 'label': "TCP Connection Hash Buckets",
                 'parents': ['cmdline']
             },

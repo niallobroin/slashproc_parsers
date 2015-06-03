@@ -24,7 +24,7 @@ curl -X POST http://localhost:8848 -d '{"method": "get_data", "id":"4", "params"
 
 curl -X POST http://localhost:8848 -d '{"method": "get_data", "id":"5", "params":{"parser":"uptime", "get":"total"}}'
 
-
+curl http://localhost:8848/proc/uptime/total
 
 import requests
 

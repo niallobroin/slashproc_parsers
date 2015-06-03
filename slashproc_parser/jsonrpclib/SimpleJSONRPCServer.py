@@ -158,7 +158,7 @@ class SimpleJSONRPCRequestHandler(
         method = "get_data"
 
         response = self.server._dispatch(method, params)
-        json_response = json.dumps(response.get('found', ''))
+        json_response = json.dumps({"result":response})
 
         self.send_response(200)
         self.send_header("Content-type", "application/json")

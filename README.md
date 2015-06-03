@@ -15,13 +15,19 @@ pip install git+git://github.com/niallobyrnes/slashproc_parsers.git
 ### Examples ###
 
 curl -X POST http://localhost:8848 -d '{"method": "get_parsers", "id":"1"}}'
+
 curl -X POST http://localhost:8848 -d '{"method": "get_groups", "id":"2", "params":{"path":"/proc/uptime"}}'
+
 curl -X POST http://localhost:8848 -d '{"method": "get_vars", "id":"3", "params":{"path":"/proc/uptime"}}'
+
 curl -X POST http://localhost:8848 -d '{"method": "get_data", "id":"4", "params":{"path":"/proc/uptime/total"}}'
+
 curl -X POST http://localhost:8848 -d '{"method": "get_data", "id":"5", "params":{"parser":"uptime", "get":"total"}}'
 
 
+
 import requests
+
 addr = "http://localhost:8848"
 
 requests.post(addr, data='{"method": "get_parsers", "id":10}').json()

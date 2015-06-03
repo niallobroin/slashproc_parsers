@@ -1,3 +1,4 @@
+import json
 import slashproc_parser.jsonrpclib as jsonrpclib
 from slashproc_parser.jsonrpclib import Fault
 from slashproc_parser.jsonrpclib.jsonrpc import USE_UNIX_SOCKETS
@@ -150,7 +151,23 @@ class SimpleJSONRPCDispatcher(SimpleXMLRPCServer.SimpleXMLRPCDispatcher):
 
 class SimpleJSONRPCRequestHandler(
         SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
-    
+
+    def do_GET(self):
+
+        params = {"path": self.path}
+        method = "get_data"
+
+        response = self.server._dispatch(method, params)
+        json_response = json.dumps(response.get('found', ''))
+
+        self.send_response(200)
+        self.send_header("Content-type", "application/json")
+        self.send_header("Content-length", str(len(json_response)))
+        self.end_headers()
+        self.wfile.write(json_response)
+        self.wfile.flush()
+        self.connection.shutdown(1)
+
     def do_POST(self):
         if not self.is_rpc_path_valid():
             self.report_404()

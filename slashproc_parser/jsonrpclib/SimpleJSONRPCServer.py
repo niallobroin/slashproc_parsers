@@ -152,21 +152,17 @@ class SimpleJSONRPCDispatcher(SimpleXMLRPCServer.SimpleXMLRPCDispatcher):
 class SimpleJSONRPCRequestHandler(
         SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
 
+    get_routes = {"slashproc": "get_data"}
+
     def do_GET(self):
-
-        params = {"path": self.path}
-        method = "get_data"
-
+        method, params = self._validate_get_path()
+        if not (method or params):
+            self.report_404()
+            return
         response = self.server._dispatch(method, params)
-        json_response = json.dumps({"result":response})
-
+        json_response = json.dumps({"result": response})
         self.send_response(200)
-        self.send_header("Content-type", "application/json")
-        self.send_header("Content-length", str(len(json_response)))
-        self.end_headers()
-        self.wfile.write(json_response)
-        self.wfile.flush()
-        self.connection.shutdown(1)
+        self._send(json_response, "application/json")
 
     def do_POST(self):
         if not self.is_rpc_path_valid():
@@ -191,12 +187,24 @@ class SimpleJSONRPCRequestHandler(
             response = fault.response()
         if response == None:
             response = ''
-        self.send_header("Content-type", "application/json-rpc")
+        self._send(response, "application/json-rpc")
+        
+    def _validate_get_path(self):
+        parts = [p.strip() for p in self.path.split("/") if p.strip()]
+        for prefix, method in self.get_routes.items():
+            if parts[0] == prefix:
+                params = "/" + "/".join(parts[1:])
+                return method, {"path": params}
+        return None, None
+        
+    def _send(self, response, content_type):
+        self.send_header("Content-type", content_type)
         self.send_header("Content-length", str(len(response)))
         self.end_headers()
         self.wfile.write(response)
         self.wfile.flush()
         self.connection.shutdown(1)
+    
 
 class SimpleJSONRPCServer(SocketServer.TCPServer, SimpleJSONRPCDispatcher):
 

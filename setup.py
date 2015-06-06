@@ -40,5 +40,6 @@ setup(name='slashproc_parsers',
       packages=['slashproc_parser',
                 'slashproc_parser.parsers',
                 'slashproc_parser.jsonrpclib'],
+      data_files=[('/etc/init.d', ['slashproc-parsers'])],
       scripts=['bin/delete_non_compliant_parsers.py'],
       classifiers=classifiers)

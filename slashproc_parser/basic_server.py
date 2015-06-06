@@ -9,7 +9,6 @@ curl -X POST http://localhost:8848 -d '{"method": "get_data", "id":"2", "params"
 reply
 {"jsonrpc": "2.0", "result": {"uptime": {"found": {"uptime": 55}}}, "id": "2"}
 """
-
 import sys
 import parsers
 
@@ -47,7 +46,7 @@ def import_parsers():
 
 
     for modpy in parsers.__all__:
-        mod = __import__('parsers.' + modpy, fromlist=[modpy])
+        mod = __import__('slashproc_parser.parsers.' + modpy, fromlist=[modpy])
 
         classes = [getattr(mod, modpy) for modpy in dir(mod)
             if isinstance(getattr(mod, modpy), type) and modpy not in 

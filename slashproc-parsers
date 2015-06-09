@@ -1,29 +1,63 @@
 #!/bin/bash
+
 # chkconfig: 2345 20 80
-# processname: slashproc_parsers
 # description: Launches simple json-rpc /proc parsing localhost server
 
-DAEMON_NAME=slashproc_parsers
-DAEMON_USER=root
-BIN="/usr/bin/python"
-ARGS="-m slashproc_parser.basic_server"
-PIDFILE="/var/run/$DAEMON_NAME.pid"
+### BEGIN INIT INFO
+# Provides:          slashproc-parsers
+# Required-Start:    networking
+# Required-Stop:     networking
+# Default-Start:     2 3 4 5
+# Default-Stop:      2 3 4 5
+# Short-Description: Starts slashproc_parsers localhost server
+# Description:       Starts basic HTTP-server from slashproc_parsers python module
+#     that provides parsers for /proc catalogue files
+### END INIT INFO
 
-. /lib/lsb/init-functions
+NAME=slashproc-parsers
+DAEMON=slashproc-parsers
+DAEMON_BIN=/usr/bin/python
+DAEMON_ARGS="-m slashproc_parser.basic_server"
+PIDFILE=/var/run/$NAME.pid
 
 start() {
-    log_daemon_msg "Starting daemon $DAEMON_NAME"
-    start-stop-daemon --start --background --make-pidfile --pidfile $PIDFILE --exec $BIN -- $ARGS
-    log_end_msg $?
+    printf "%-50s" "Starting $NAME..."
+    PID=`$DAEMON_BIN $DAEMON_ARGS > /dev/null 2>&1 & echo $!`
+    if [ -z $PID ]; then
+        printf "Fail\n"
+    else
+        echo $PID > $PIDFILE
+        printf "OK\n"
+    fi
+}
+
+status() {
+    printf "%-50s" "Check $NAME status..."
+    if [ -f $PIDFILE ]; then
+        PID=`cat $PIDFILE`
+        if [ -z "`ps axf | grep ${PID} | grep -v grep`"]; then
+            printf "Process dead but PID-file exists\n"
+        else
+            echo "Running..."
+        fi
+    else
+        printf "Service not running\n"
+    fi
 }
 
 stop() {
-    log_daemon_msg "Stopping daemon $DAEMON_NAME"
-    start-stop-daemon --stop --pidfile $PIDFILE --retry 10
-    log_end_msg $?
+    printf "%-50s" "Stopping $NAME..."
+    PID=`cat $PIDFILE`
+    if [ -f $PIDFILE ]; then
+        kill -HUP $PID
+        printf "OK\n"
+        rm -f $PIDFILE
+    else
+        printf "PID-file not found\n"
+    fi
 }
 
-case "$1" in 
+case "$1" in
     start)
        start
        ;;
@@ -35,8 +69,7 @@ case "$1" in
        start
        ;;
     status)
-       # code to check status of app comes here 
-       # example: status program_name
+       status
        ;;
     *)
        echo "Usage: $0 {start|stop|status|restart}"

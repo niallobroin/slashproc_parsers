@@ -1,0 +1,9 @@
+uid = string(min=16, max=32)
+vars = string_list(min=0, max=64)
+active = boolean(default=False)
+working_dir = string(min=1, max=256, default="/tmp")
+
+
+
+
+

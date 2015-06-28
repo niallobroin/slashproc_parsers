@@ -41,6 +41,9 @@ class ERR():
         return {'err': num, 'msg':msg}
 
 
+
+
+
 def import_parsers():
     """
     Imports the parsers
@@ -252,14 +255,31 @@ def get_data(path=None, parser=None, get=None):
 
 
 
-config = ConfigObj('server.config', configspec='server_config.validator')
+
+
+config = ConfigObj("parser" + '.config', configspec='server_config.validator')
 validator = Validator()
 
 
+
 def config_upsert(key, val):
+    """
+    Updates or inserts a key val pair into the config file
+    """
     config[key] = val
     result = config.validate(validator)
     return {'result': result}
+
+
+def config_insert(section, doc):
+    """
+    Inserts a dictionary (document) into the config file
+    """
+    config[section] = doc
+    result = config.validate(validator)
+    return {'result': result}
+
+
 
 
 def main():
@@ -270,7 +290,7 @@ def main():
     server.register_function(get_data)
 
     server.register_function(config_upsert)
-
+    server.register_function(config_insert)
 
     server.serve_forever()
 

@@ -15,6 +15,10 @@ import parsers
 from SocketServer import ThreadingMixIn
 from slashproc_parser.jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 
+from slashproc_parser.configobj.configobj import ConfigObj
+from slashproc_parser.configobj.validate import Validator
+
+
 SERVER_PORT = 8848
 
 #do debug mode and
@@ -246,12 +250,28 @@ def get_data(path=None, parser=None, get=None):
 
     return retdict
 
+
+
+config = ConfigObj('server.config', configspec='server_config.validator')
+validator = Validator()
+
+
+def config_upsert(key, val):
+    config[key] = val
+    result = config.validate(validator)
+    return {'result': result}
+
+
 def main():
     server = SimpleThreadedJSONRPCServer(('localhost', SERVER_PORT))
     server.register_function(get_parsers)
     server.register_function(get_groups)
     server.register_function(get_vars)
     server.register_function(get_data)
+
+    server.register_function(config_upsert)
+
+
     server.serve_forever()
 
 if __name__ == '__main__':

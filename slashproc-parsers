@@ -27,7 +27,12 @@ start() {
         printf "Fail\n"
     else
         echo $PID > $PIDFILE
-        printf "OK\n"
+        if ! [ -f $PIDFILE ]; then
+            printf "Unable to create pid_file, exiting...\n"
+            kill -HUP $PID
+        else 
+            printf "OK\n"
+        fi
     fi
 }
 

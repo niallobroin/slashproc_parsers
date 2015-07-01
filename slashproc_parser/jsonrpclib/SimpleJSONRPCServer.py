@@ -152,17 +152,25 @@ class SimpleJSONRPCDispatcher(SimpleXMLRPCServer.SimpleXMLRPCDispatcher):
 class SimpleJSONRPCRequestHandler(
         SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
 
-    get_routes = {"slashproc": "get_data"}
+    get_routes = [
+        (r"^/slashproc/(?P<parser>[_\w]+)/vars/(?P<var>[_\w]+)$", "get_vars"),
+        (r"^/slashproc/(?P<parser>[_\w]+)/groups/$", "get_groups"),
+        (r"^/slashproc/(?P<data>[/_\w]+)$", "get_data")
+    ]
 
     def do_GET(self):
-        method, params = self._validate_get_path()
-        if not (method or params):
-            self.report_404()
+        import re
+        for reg, handler in self.get_routes:
+            match = re.match(reg, self.path)
+            if not match:
+                continue
+            query = "/" + "/".join(match.groups())
+            response = self.server._dispatch(handler, {"path": query})
+            json_response = json.dumps({"result": response})
+            self.send_response(200)
+            self._send(json_response, "application/json")
             return
-        response = self.server._dispatch(method, params)
-        json_response = json.dumps({"result": response})
-        self.send_response(200)
-        self._send(json_response, "application/json")
+        self.report_404()
 
     def do_POST(self):
         if not self.is_rpc_path_valid():
@@ -188,15 +196,7 @@ class SimpleJSONRPCRequestHandler(
         if response == None:
             response = ''
         self._send(response, "application/json-rpc")
-        
-    def _validate_get_path(self):
-        parts = [p.strip() for p in self.path.split("/") if p.strip()]
-        for prefix, method in self.get_routes.items():
-            if parts[0] == prefix:
-                params = "/" + "/".join(parts[1:])
-                return method, {"path": params}
-        return None, None
-        
+
     def _send(self, response, content_type):
         self.send_header("Content-type", content_type)
         self.send_header("Content-length", str(len(response)))

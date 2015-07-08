@@ -41,20 +41,22 @@ class TestBasicServer(unittest.TestCase):
             self.assertTrue(
                 'found' in result,
                 "parameter '%s' should be found but was not" % request)
+
             if VERBOSE:
                 pprint.pprint(result)
 
-    def test_simple_get_requests(self):
+    def test_simple_GET_requests(self):
         get_requests = (
             'uptime',
             'sysnet',
+            'version',
             'meminfo/memfree',
             'cpuinfo/model_name',
             'cpuinfo/bogomips/core_id')
 
         self.assertRequests(get_requests)
 
-    def test_groups_and_vars_get_requests(self):
+    def test_groups_and_vars_GET_requests(self):
         get_requests = (
             'uptime/groups/',
             'uptime/vars/total',
@@ -64,6 +66,38 @@ class TestBasicServer(unittest.TestCase):
             'version/vars/user')
 
         self.assertRequests(get_requests)
+
+    def test_get_parsers_POST_request(self):
+        data = json.dumps({"method": "get_parsers", "id": "1"})
+        r = urllib2.Request(self.server_url, data)
+        response = urllib2.urlopen(r)
+        result = json.loads(response.read())
+
+        for parser in get_parsers():
+            self.assertIn(parser, result["result"], "Parser name '%s' not found" % parser)
+
+    def test_simple_POST_requests(self):
+        url = self.server_url
+
+        post_requests = (
+            {"method": "get_groups", "id": "2", "params": {"path": "/proc/uptime"}},
+            {"method": "get_vars", "id": "3", "params": {"path": "/proc/uptime"}},
+            {"method": "get_data", "id": "4", "params": {"path": "/proc/uptime/total"}},
+            {"method": "get_data", "id": "5", "params": {"parser": "uptime", "get": "total"}}
+        )
+
+        for params in post_requests:
+            data = json.dumps(params).encode()
+            r = urllib2.Request(url, data)
+            response = urllib2.urlopen(r)
+            result = json.loads(response.read())
+            self.assertIn("jsonrpc", result)
+            self.assertIn("result", result)
+            self.assertNotIn("err", result["result"], "Got unexpected error in request: %s" % params)
+
+            if VERBOSE:
+                pprint.pprint(result)
+
 
 if __name__ == '__main__':
     unittest.main()
